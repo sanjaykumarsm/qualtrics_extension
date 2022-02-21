@@ -1,0 +1,14 @@
+.vscode
+node_modules
+.DS_Store
+dist
+public/js
+public/css
+public/*.js
+public/*.js.map
+public/*.css
+public/*.html
+public/*.woff
+public/*.woff2
+public/*.eot
+public/*.ttf

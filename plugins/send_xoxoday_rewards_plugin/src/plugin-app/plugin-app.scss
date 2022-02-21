@@ -1,0 +1,47 @@
+.plugin-app {
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  .plugin-section ~ .plugin-section {
+    padding-top: 24px;
+  }
+  
+  * ~ .section-content {
+    padding-top: 12px;
+  }
+  
+  .plugin-section {
+    h1, h2, h3, h4, h5, h6, .example-header {
+      padding-bottom: 12px;
+    }
+  }
+
+  .section-heading {
+    font-weight: regular;
+    font-size: 18px;
+    color: #32363A;
+    margin-bottom: 8px;
+  }
+
+  .section-content {
+    font-weight: regular;
+    font-size: 14px;
+    color: #32363A;
+    margin-bottom: 24px;
+  }
+
+  .selectMenuContainer {
+    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .selectMenuWrapperLabel {
+    color: #515559;
+    padding-bottom:6px;
+  }
+
+  .selectMenu {
+    width: 300px;
+  }
+}

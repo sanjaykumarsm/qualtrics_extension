@@ -1,0 +1,119 @@
+{
+  "meta": {
+    "summary": "Extension Plugin Language Strings - EN"
+  },
+  "strings": {
+    "name": {
+      "text": "Send Xoxoday Rewards Plugin",
+      "context": "Plugin name"
+    },
+    "description": {
+      "text": "Actions Task Description",
+      "context": "Displayed when listing plugin"
+    },
+    "introHeading": {
+      "text": "Introductory Section",
+      "context": "Displayed to users when they are configuring the plugin"
+    },
+    "introContent": {
+      "text": "This is where you can place some high-level information to help the user configure your plugin",
+      "context": "Additional info for users on what steps to take"
+    },
+    "defaultFieldNameRespondentEmail": {
+      "text": "Respondent Email",
+      "context": "Respondent Email form field name"
+    },
+    "defaultFieldTooltipRespondentEmail": {
+      "text": "Survey Respondent Email",
+      "context": "Respondent Email form field tooltip"
+    },
+    "defaultFieldNameRespondentFirstName": {
+      "text": "Respondent First Name",
+      "context": "Respondent First Name form field name"
+    },
+    "defaultFieldTooltipRespondentFirstName": {
+      "text": "Survey Respondent First Name",
+      "context": "Respondent First Name form field tooltip"
+    },
+    "defaultFieldNameRespondentLastName": {
+      "text": "Respondent Last Name",
+      "context": "Respondent Last Name form field name"
+    },
+    "defaultFieldTooltipRespondentLastName": {
+      "text": "Survey Respondent Last Name",
+      "context": "Respondent Last Name form field tooltip"
+    },
+    "defaultFieldNameRespondentLocation": {
+      "text": "Respondent Location",
+      "context": "Respondent Location form field name"
+    },
+    "defaultFieldTooltipRespondentLocation": {
+      "text": "Survey Respondent Location",
+      "context": "Respondent Location form field tooltip"
+    },
+    "defaultFieldNameRespondentPhone": {
+      "text": "Respondent Phone",
+      "context": "Respondent Phone form field name"
+    },
+    "defaultFieldTooltipRespondentPhone": {
+      "text": "Survey Respondent Phone",
+      "context": "Respondent Phone form field tooltip"
+    },
+    "addFieldDropdownLabel": {
+      "text": "Add Fields",
+      "context": "The label for the dropdown to add additional form fields"
+    },
+    "customFieldLabel": {
+      "text": "New Field",
+      "context": "The label to add a dynamic key-value pair to the form"
+    },
+    "customFieldNameTooltip": {
+      "text": "The Key for this Custom Field",
+      "context": "The tooltip for the key of the newly added dynamic field"
+    },
+    "customFieldValueTooltip": {
+      "text": "The Value for this Custom Field",
+      "context": "The tooltip for the value of the newly added dynamic field"
+    },
+    "customFieldNamePlaceholder": {
+      "text": "Field Key",
+      "context": "The placeholder for key of the newly added dynamic field"
+    },
+    "customFieldValuePlaceholder": {
+      "text": "Field Value",
+      "context": "The placeholder for value of the newly added dynamic field"
+    },
+    "selectMenuLabel": {
+      "text": "Select Menu Label",
+      "context": "The label for the Select Menu or dropdown"
+    },
+    "selectMenuWrapperLabel": {
+      "text": "Select a campaign",
+      "context": "The wrapper label for the Select Menu"
+    },
+    "selectMenuGenericErrorMessage": {
+      "text": "An issue is affecting the dropdown functionality",
+      "context": "The generic error message for the dropdown"
+    },
+    "selectMenuOptionInvalidErrorMessage": {
+      "text": "Your selected option is no longer available",
+      "context": "A specific error message for the dropdown when a menu option is no longer available to the use"
+    },
+    "customerMessageInstructions": {
+      "text": "A message will be sent to the customer upon offering them a free ride",
+      "context": "Information on filling out the outgoing message form"
+    },
+    "customerMessageLabel": {
+      "text": "Message",
+      "context": "Placeholder label for the customer message input"
+    },
+    "defaultCustomerMessage": {
+      "text": "Thanks for completing our survey. We’d like to offer you a free ride from ACME Rideshare!",
+      "context": "The default outgoing message for rideshare recipients."
+    },
+    "customerMessageWithRideType": {
+      "text": "Thanks for completing our survey. We’d like to offer you a free ride from ACME Rideshare! Your ride type will be: ",
+      "context": "The outgoing message for rideshare recipients which will include the ride type."
+    }
+  }
+}

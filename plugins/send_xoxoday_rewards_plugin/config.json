@@ -1,0 +1,21 @@
+{
+  "credentials": [
+    "s100_oauth2_scope"
+  ],
+  "id": "PLUG_9a58867b-56e9-47a2-a7f3-2fe2530100e3",
+  "type": "actions_task",
+  "version": "0.0.1",
+  "metadata": {
+    "tags": [
+      "test",
+      "tag",
+      "survey"
+    ],
+    "worker": {
+      "type": "runner"
+    }
+  },
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema"
+  }
+}
