@@ -37,6 +37,7 @@ export function RideTypeSelectMenu(props, ref) {
   // const toggledate = () => setdateToggled(!isDateToggled);
 
   useEffect(retrieveSelectMenuOptions, []);
+  useEffect(getAutomationDetails, []);
 
   //useEffect(nextPageAction, []);
 
@@ -46,7 +47,7 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   function CreateAndEditAutomation() {
-    if(isDateToggled && approvalType === 'yes') {
+    if(isDateToggled && approvalType === 'no') {
       if(startDate === '') {
         console.log('start date empty');
         setDateErrorMessage('Start date can not be empty');
@@ -57,7 +58,7 @@ export function RideTypeSelectMenu(props, ref) {
         return;
       }
     }
-    if(isMaxRewardToggled && approvalType === 'yes' && maxCountValue < 1) {
+    if(isMaxRewardToggled && approvalType === 'no' && maxCountValue < 1) {
       setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
       return;
     }
@@ -73,7 +74,7 @@ export function RideTypeSelectMenu(props, ref) {
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': maxCountValue, 'instantApproval': approvalType === 'yes' ? true : false, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': isAllowRepeatRewarding } } },
+            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': approvalType === 'yes' ? null : maxCountValue, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': approvalType === 'yes' ? true : isAllowRepeatRewarding } } },
           };
 
           config.connection = {
@@ -103,12 +104,12 @@ export function RideTypeSelectMenu(props, ref) {
 
         } catch(error) {
           console.log(error);
-          setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
+
         } finally {
           setIsLoading(false);
         }
       } else {
-        setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
+
         setIsLoading(false);
       }
     }
@@ -116,7 +117,44 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   props.biRef.nextPageSetup = nextPageSetup;
+  function getAutomationDetails() {
+    (async () => {
+      if(authConnectionName) {
+        try {
 
+          const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
+          const config = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: { 'query': 'qualtrics_ext.query.getAutomationBySurveyId', 'tag': 'qualtrics_ext', 'variables': { 'survey_id': client.pluginClientInstance.context.userMeta.surveyId, 'platform_id': 16 } },
+          };
+
+          config.connection = {
+            connectionName: authConnectionName,
+            paramFormat: 'header',
+            paramName: 'Authorization',
+            paramTemplate: 'Bearer %s'
+          };
+          const result = await client.fetch(url, config);
+          console.log(result);
+          if(result && result.responseData && result.responseData.data && result.responseData.data.getAutomationBySurveyId &&  result.responseData.data.getAutomationBySurveyId.success) {
+            let automationData = result.responseData.data.getAutomationBySurveyId.data;
+
+            console.log(automationData);
+          } else {
+            console.log('error in loading automation details');
+          }
+        } catch(error) {
+          console.log(error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    }
+    )();
+  }
   function retrieveSelectMenuOptions() {
     (async () => {
       if(authConnectionName) {
@@ -288,7 +326,7 @@ export function RideTypeSelectMenu(props, ref) {
               </p>
             </h4>
 
-            <Switch style={{ marginTop: 12 }} onChange={onDistributeChnage} disabled = {approvalType === 'no' ? true : false} checked = {isDateToggled}/>
+            <Switch style={{ marginTop: 12 }} onChange={onDistributeChnage} disabled = {approvalType === 'yes' ? true : false} checked = {isDateToggled}/>
           </div>
           {isDateToggled ?
 
@@ -317,7 +355,7 @@ export function RideTypeSelectMenu(props, ref) {
               Define the maximum number of rewards that will be sent out automatically. {' '}
               </p>
             </h4>
-            <Switch style={{ marginTop: 12 }} onChange={onChangeOfMaxCount} disabled = {approvalType === 'no' ? true : false} checked = {isMaxRewardToggled}/>
+            <Switch style={{ marginTop: 12 }} onChange={onChangeOfMaxCount} disabled = {approvalType === 'yes' ? true : false} checked = {isMaxRewardToggled}/>
           </div>
           {isMaxRewardToggled ?
             <div>
@@ -340,7 +378,7 @@ export function RideTypeSelectMenu(props, ref) {
               </p>
             </h4>
 
-            <Switch style={{ marginTop: 12 }} onChange={onChangeOfAllowRepeat} disabled = {approvalType === 'no' ? true : false} checked = {isAllowRepeatRewarding}/>
+            <Switch style={{ marginTop: 12 }} onChange={onChangeOfAllowRepeat} disabled = {approvalType === 'yes' ? true : false} checked = {isAllowRepeatRewarding}/>
 
           </div>
 
