@@ -16,6 +16,8 @@ export function RideTypeSelectMenu(props, ref) {
 
   const [ isLoading, setIsLoading ] = useState(true);
   const [ menuErrorMessage, setMenuErrorMessage ] = useState();
+  const [ maxCountErrorMessage, setmaxCountErrorMessage ] = useState();
+  const [ dateMessage, setDateErrorMessage ] = useState();
   const [ menuOptions, setMenuOptions ] = useState([]);
   const [ selectedCampaign, setSelectedCampaign ] = useState([]);
   const [ isDateToggled, setdateToggled ] = useState(false);
@@ -44,6 +46,21 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   function CreateAndEditAutomation() {
+    if(isDateToggled && approvalType === 'yes') {
+      if(startDate === '') {
+        console.log('start date empty');
+        setDateErrorMessage('Start date can not be empty');
+        return;
+      } else if(endDate === '') {
+        console.log('end date empty');
+        setDateErrorMessage('End date can not be empty');
+        return;
+      }
+    }
+    if(isMaxRewardToggled && approvalType === 'yes' && maxCountValue < 1) {
+      setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
+      return;
+    }
 
     (async () => {
       if(authConnectionName) {
@@ -56,7 +73,7 @@ export function RideTypeSelectMenu(props, ref) {
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': 0, 'instantApproval': approvalType === 'yes' ? true : false, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': isAllowRepeatRewarding } } },
+            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': maxCountValue, 'instantApproval': approvalType === 'yes' ? true : false, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': isAllowRepeatRewarding } } },
           };
 
           config.connection = {
@@ -66,7 +83,13 @@ export function RideTypeSelectMenu(props, ref) {
             paramTemplate: 'Bearer %s'
           };
           const result = await client.fetch(url, config);
-          console.log(JSON.stringify(result));
+          console.log(result);
+          if(result && result.responseData && result.responseData.data && result.responseData.data.setupExtensionBasedAutomation &&  result.responseData.data.setupExtensionBasedAutomation.success) {
+            console.log('dcfvgbhnj');
+            props.moveToNextPage(2);
+          } else {
+            console.log('failed to create automation');
+          }
           // if(result.responseData && result.responseData.data && result.responseData.data && result.responseData.data.getOneClickSiteList) {
           //   const campaign_res = result.responseData.data.getOneClickSiteList;
           //   if(campaign_res.success) {
@@ -280,6 +303,11 @@ export function RideTypeSelectMenu(props, ref) {
             />
 
             : null}
+          {dateMessage && isDateToggled &&
+              <div>
+                <span className='errorMsg'>{dateMessage}</span>
+              </div>
+          }
           <div
             style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
           >
@@ -296,7 +324,11 @@ export function RideTypeSelectMenu(props, ref) {
               <Input className="_2NEGNnn" type="number"  onChange={handleChange}/>
             </div> :  null}
           <div>
-
+            {maxCountErrorMessage && isMaxRewardToggled &&
+            <div>
+              <span className='errorMsg'>{maxCountErrorMessage}</span>
+            </div>
+            }
           </div>
           <div
             style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
@@ -309,7 +341,9 @@ export function RideTypeSelectMenu(props, ref) {
             </h4>
 
             <Switch style={{ marginTop: 12 }} onChange={onChangeOfAllowRepeat} disabled = {approvalType === 'no' ? true : false} checked = {isAllowRepeatRewarding}/>
+
           </div>
+
         </div>
       </div>
 

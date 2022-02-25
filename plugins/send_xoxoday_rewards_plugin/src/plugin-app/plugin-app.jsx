@@ -155,8 +155,9 @@ export function PluginApp(props) {
               biRef={biRef}
               client={client}
               selectedMenuOption={taskDefinition.config.selectedMenuOption}
-              saveSelection={saveSelection}
               toggleSaveButtonState={toggleSaveButtonState}
+              saveSelection={saveSelection}
+              moveToNextPage = {moveToNextPage}
             >
             </RideTypeSelectMenu>
 
@@ -174,7 +175,9 @@ export function PluginApp(props) {
         );
     }
   }
-
+  function moveToNextPage(page) {
+    setPageNum(page);
+  }
   function attachFormFieldsToTaskDefinition(formFields) {
     const updatedTaskDefinition = cloneDeep(taskDefinition);
     updatedTaskDefinition.config.formFields = formFields;
