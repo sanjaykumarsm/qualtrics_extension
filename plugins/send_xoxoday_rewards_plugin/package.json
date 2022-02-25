@@ -23,7 +23,10 @@
     "@qualtrics/ui-react": "^1.63.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
+    "moment": "^2.29.1",
     "react": "^16.14.0",
+    "react-datepicker": "^4.6.0",
+    "react-dates": "^21.8.0",
     "react-dom": "^16.14.0",
     "string-replace-loader": "^2.2.0",
     "uuid": "^8.3.2"

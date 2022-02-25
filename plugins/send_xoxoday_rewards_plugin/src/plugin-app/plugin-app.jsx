@@ -2,14 +2,14 @@
 import './plugin-app.scss';
 
 // External (npm) dependencies
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import cloneDeep from 'lodash.clonedeep';
 
 // Internal dependencies
 import { ConfigurationForm } from './page-one/configuration-form.jsx';
 import { IntroductorySection } from './page-one/introductory-section.jsx';
 import { RideTypeSelectMenu } from './page-one/ride-type-select-menu.jsx';
-import { CustomerMessageForm } from './page-two/customer-message-form.jsx';
+//import { CustomerMessageForm } from './page-two/customer-message-form.jsx';
 import { getDefaultTaskDefinition, formatConnection, formatFormData } from './outbound-http-request-task-definition';
 
 export function PluginApp(props) {
@@ -19,7 +19,7 @@ export function PluginApp(props) {
   /////////////////////////////////////////////
 
   const client = props.client;
-
+  const biRef = useRef();
   /////////////////////////////////////
   /////////////   Hooks   /////////////
   /////////////////////////////////////
@@ -40,7 +40,7 @@ export function PluginApp(props) {
   }, [ taskDefinition ]);
 
   useEffect(() => {
-    client.onNext(page => setPageNum(page));
+    client.onNext(page => nextPageSetup(page));
     client.onBack(page => setPageNum(page));
   }, []);
 
@@ -53,6 +53,11 @@ export function PluginApp(props) {
       {renderPage()}
     </div>
   );
+
+  function nextPageSetup(page) {
+    biRef.nextPageSetup();
+    //from call
+  }
 
   /////////////////////////////////////////////
   /////////////   Hook Handlers   /////////////
@@ -101,11 +106,11 @@ export function PluginApp(props) {
     setTaskDefinition(updatedTaskDefinition);
   }
 
-  function saveMessage(message) {
-    const updatedTaskDefinition = cloneDeep(taskDefinition);
-    updatedTaskDefinition.config.customerMessage = message;
-    setTaskDefinition(updatedTaskDefinition);
-  }
+  // function saveMessage(message) {
+  //   const updatedTaskDefinition = cloneDeep(taskDefinition);
+  //   updatedTaskDefinition.config.customerMessage = message;
+  //   setTaskDefinition(updatedTaskDefinition);
+  // }
 
   /////////////////////////////////////////////////////
   /////////////   Client Event Handlers   /////////////
@@ -147,28 +152,25 @@ export function PluginApp(props) {
             >
             </IntroductorySection>
             <RideTypeSelectMenu
+              biRef={biRef}
               client={client}
               selectedMenuOption={taskDefinition.config.selectedMenuOption}
               saveSelection={saveSelection}
+              toggleSaveButtonState={toggleSaveButtonState}
             >
             </RideTypeSelectMenu>
-            <ConfigurationForm
-              client={client}
-              toggleSaveButtonState={toggleSaveButtonState}
-              attachFormFieldsToTaskDefinition={attachFormFieldsToTaskDefinition}
-              formFields={taskDefinition.config.formFields}
-            >
-            </ConfigurationForm>
+
           </>
         );
       case 2:
         return (
-          <CustomerMessageForm
+          <ConfigurationForm
             client={client}
-            customerMessage={taskDefinition.config.customerMessage}
-            saveMessage={saveMessage}
+            toggleSaveButtonState={toggleSaveButtonState}
+            attachFormFieldsToTaskDefinition={attachFormFieldsToTaskDefinition}
+            formFields={taskDefinition.config.formFields}
           >
-          </CustomerMessageForm>
+          </ConfigurationForm>
         );
     }
   }

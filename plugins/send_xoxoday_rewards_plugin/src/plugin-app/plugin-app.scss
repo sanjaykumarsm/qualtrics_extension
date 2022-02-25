@@ -37,11 +37,44 @@
     flex-direction: column;
   }
   .selectMenuWrapperLabel {
-    color: #515559;
+    color: #74777A;
     padding-bottom:6px;
+    font-size: 14px;
+  }
+  .sub-section-description{
+    color: #74777A;
+    font-weight: normal;
+    font-size: 14px;
+  }
+
+  .section-description {
+    font-weight: normal;
+    font-size: 14px;
+    color: #32363A;
   }
 
   .selectMenu {
     width: 300px;
+  }
+  .wrap {
+    width: 100%;
+    }
+    .floatleft {
+      float:left; 
+      width: 50%;
+      height: 400px;
+  }
+  
+  .floatright {
+    float: right;
+      height: 400px;
+      width: 50%;
+  }
+  ._2NEGNnn{
+    //width: 242px; 
+    background-color: white !important;
+    border: 1px solid #bac7d5 !important;
+    height: 45px !important;
+    margin-top: -15px !important;
   }
 }

@@ -88,8 +88,16 @@
       "context": "The label for the Select Menu or dropdown"
     },
     "selectMenuWrapperLabel": {
-      "text": "Select a campaign",
+      "text": "Campaign",
       "context": "The wrapper label for the Select Menu"
+    },
+    "configCampaign": {
+      "text": "Configure campaign",
+      "context": "The wrapper label for the Configure campaign"
+    },
+    "additionalSetting": {
+      "text": "Additional Setting",
+      "context": "The wrapper label for the Additional Setting"
     },
     "selectMenuGenericErrorMessage": {
       "text": "An issue is affecting the dropdown functionality",
