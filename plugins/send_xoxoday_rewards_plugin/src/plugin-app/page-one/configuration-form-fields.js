@@ -6,9 +6,9 @@ export {
 function getStaticFields(client) {
   return [
     { name: client.getText('defaultFieldNameRespondentEmail'), required: true, isVisible: true, id: 'email', valueTooltip: client.getText('defaultFieldTooltipRespondentEmail'), valuePlaceholder: '', validate: validateThatKeyAndValueAreStrings },
-    { name: client.getText('defaultFieldNameRespondentFirstName'), required: true, isVisible: true, id: 'first-name', valueTooltip: client.getText('defaultFieldTooltipRespondentFirstName'), valuePlaceholder: '', validate: validateThatKeyAndValueAreStrings },
-    { name: client.getText('defaultFieldNameRespondentLastName'), required: true, isVisible: true, id: 'last-name', valueTooltip: client.getText('defaultFieldTooltipRespondentLastName'), valuePlaceholder: '', validate: validateThatKeyAndValueAreStrings },
-    { name: client.getText('defaultFieldNameRespondentLocation'), required: true, isVisible: true, id: 'location', valueTooltip: client.getText('defaultFieldTooltipRespondentLocation'), valuePlaceholder: '', validate: validateThatKeyAndValueAreStrings }
+    // { name: client.getText('defaultFieldNameRespondentFirstName'), required: true, isVisible: true, id: 'first-name', valueTooltip: client.getText('defaultFieldTooltipRespondentFirstName'), valuePlaceholder: '', validate: validateThatKeyAndValueAreStrings },
+    // { name: client.getText('defaultFieldNameRespondentLastName'), required: true, isVisible: true, id: 'last-name', valueTooltip: client.getText('defaultFieldTooltipRespondentLastName'), valuePlaceholder: '', validate: validateThatKeyAndValueAreStrings },
+    // { name: client.getText('defaultFieldNameRespondentLocation'), required: true, isVisible: true, id: 'location', valueTooltip: client.getText('defaultFieldTooltipRespondentLocation'), valuePlaceholder: '', validate: validateThatKeyAndValueAreStrings }
   ];
 }
 

@@ -18,6 +18,7 @@ export function RideTypeSelectMenu(props, ref) {
   const [ menuErrorMessage, setMenuErrorMessage ] = useState();
   const [ maxCountErrorMessage, setmaxCountErrorMessage ] = useState();
   const [ dateMessage, setDateErrorMessage ] = useState();
+  const [ automationDetails, setAutomationDetails ] = useState([]);
   const [ menuOptions, setMenuOptions ] = useState([]);
   const [ selectedCampaign, setSelectedCampaign ] = useState([]);
   const [ isDateToggled, setdateToggled ] = useState(false);
@@ -28,38 +29,40 @@ export function RideTypeSelectMenu(props, ref) {
   const [ startDate, setStartDate ] = useState('');
   const [ endDate, setEndDate ] = useState('');
   const [ approvalType, setApprovalType ] = useState('yes');
+  const [ isAlreadyRewardsSent, setAlreadyRewardsSent ] = useState(false);
+  const [ rewardsTriggred, setRewardsTriggred ] = useState(0);
   // const [endFocused , setEndFocused] = useState(false);
   const handleChange = e => {
-    console.log('Change handler called!', maxCountValue);
     setMaxValue(e.target.value);
   };
   // const [ isDateToggled, setdateToggled ] = useState(false);
   // const toggledate = () => setdateToggled(!isDateToggled);
 
   useEffect(retrieveSelectMenuOptions, []);
-  useEffect(getAutomationDetails, []);
+  // useEffect(getAutomationDetails, []);
 
   //useEffect(nextPageAction, []);
 
   function nextPageSetup() {
-    console.log('came to child page page ....', selectedCampaign, approvalType);
     CreateAndEditAutomation();
   }
 
   function CreateAndEditAutomation() {
     if(isDateToggled && approvalType === 'no') {
       if(startDate === '') {
-        console.log('start date empty');
         setDateErrorMessage('Start date can not be empty');
         return;
       } else if(endDate === '') {
-        console.log('end date empty');
         setDateErrorMessage('End date can not be empty');
         return;
       }
     }
     if(isMaxRewardToggled && approvalType === 'no' && maxCountValue < 1) {
       setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
+      return;
+    }
+    if(isMaxRewardToggled && approvalType === 'no' && rewardsTriggred > maxCountValue) {
+      setmaxCountErrorMessage('Cannot be lower than the count which has already been triggered.');
       return;
     }
 
@@ -74,7 +77,7 @@ export function RideTypeSelectMenu(props, ref) {
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': approvalType === 'yes' ? null : maxCountValue, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': approvalType === 'yes' ? true : isAllowRepeatRewarding } } },
+            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': approvalType === 'yes' ? null : maxCountValue ? maxCountValue : null, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': approvalType === 'yes' ? true : isAllowRepeatRewarding } } },
           };
 
           config.connection = {
@@ -86,7 +89,6 @@ export function RideTypeSelectMenu(props, ref) {
           const result = await client.fetch(url, config);
           console.log(result);
           if(result && result.responseData && result.responseData.data && result.responseData.data.setupExtensionBasedAutomation &&  result.responseData.data.setupExtensionBasedAutomation.success) {
-            console.log('dcfvgbhnj');
             props.moveToNextPage(2);
           } else {
             console.log('failed to create automation');
@@ -117,7 +119,7 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   props.biRef.nextPageSetup = nextPageSetup;
-  function getAutomationDetails() {
+  function getAutomationDetails(campaignObj) {
     (async () => {
       if(authConnectionName) {
         try {
@@ -136,11 +138,51 @@ export function RideTypeSelectMenu(props, ref) {
             paramTemplate: 'Bearer %s'
           };
           const result = await client.fetch(url, config);
-          console.log(result);
           if(result && result.responseData && result.responseData.data && result.responseData.data.getAutomationBySurveyId &&  result.responseData.data.getAutomationBySurveyId.success) {
-            let automationData = result.responseData.data.getAutomationBySurveyId.data;
+            let campainData = result.responseData.data.getAutomationBySurveyId.data[0];
 
-            console.log(automationData);
+            if(campainData) {
+              setAutomationDetails(campainData);
+              console.log(automationDetails);
+              if(campainData.additional_details) {
+                let approvalTypeObj = campainData.additional_details.automation.approval_type  ? 'no' : 'yes';
+                setApprovalType(approvalTypeObj);
+                let max_reward_count_obj = campainData.additional_details.automation.max_reward_count;
+                let effective_from = campainData.effective_from;
+                let effective_to = campainData.effective_to;
+                let number_of_awards_triggered = campainData.number_of_awards_triggered;
+                setRewardsTriggred(number_of_awards_triggered);
+                setAlreadyRewardsSent(number_of_awards_triggered >= 1 && campainData.additional_details.automation.approval_type ? true : false);
+                setStartDate(effective_from);
+                setEndDate(effective_to);
+                setMaxValue(max_reward_count_obj >= 1 ? max_reward_count_obj : null);
+                setMaxRewardToggled(max_reward_count_obj >= 1 &&  campainData.additional_details.automation.approval_type ? true : false);
+                setdateToggled(campainData.additional_details.automation.approval_type);
+
+              }
+              if(campainData.created_action_mapping) {
+                if(campainData.created_action_mapping[0]) {
+                  let created_action_mapping = campainData.created_action_mapping[0];
+                  if(created_action_mapping.then[0]) {
+                    let actionmapping = created_action_mapping.then[0];
+                    let redeemLinkObj = actionmapping.redeem_link
+                      ? actionmapping.redeem_link
+                      : '';
+                    if(redeemLinkObj) {
+                      let onClickCapaignID = redeemLinkObj.single_link_campaign;
+                      selectedAutomationCampaign(onClickCapaignID, campaignObj);
+                      let enable_repeat_rewarding = redeemLinkObj.enable_repeat_rewarding && campainData.additional_details.automation.approval_type
+                        ? true
+                        : false;
+                      setAllowRepeat(enable_repeat_rewarding);
+                    } else {
+                      let enable_repeat_rewarding = false;
+                      setAllowRepeat(enable_repeat_rewarding);
+                    }
+                  }
+                }
+              }
+            }
           } else {
             console.log('error in loading automation details');
           }
@@ -179,6 +221,7 @@ export function RideTypeSelectMenu(props, ref) {
             const campaign_res = result.responseData.data.getOneClickSiteList;
             if(campaign_res.success) {
               setMenuOptions(campaign_res.data);
+              getAutomationDetails(campaign_res.data);
             } else {
               setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
             }
@@ -208,6 +251,25 @@ export function RideTypeSelectMenu(props, ref) {
       setdateToggled(false);
     }
 
+  }
+  function selectedAutomationCampaign(menuOptionId, menuOptionObj) {
+    // find the the selection
+    const newSelectedMenuOption = menuOptionObj.find((menuOption) => {
+      return menuOption.campaignId === menuOptionId;
+    });
+
+    if(newSelectedMenuOption === undefined) {
+      // handle the case that the selection doesn't exist
+      setMenuErrorMessage(client.getText('selectMenuOptionInvalidErrorMessage'));
+      return;
+    }
+    setSelectedCampaign(newSelectedMenuOption);
+    props.toggleSaveButtonState(true);
+    // Save it to state
+    saveSelection(newSelectedMenuOption);
+
+    // Clear out any error messages
+    setMenuErrorMessage();
   }
   function onMenuOptionSelection(menuOptionId) {
     // find the the selection
@@ -242,6 +304,7 @@ export function RideTypeSelectMenu(props, ref) {
     setdateToggled(!isDateToggled);
   }
   function handleDateFilterChange(startDate, endDate) {
+
     setStartDate(startDate);
     setEndDate(endDate);
   }
@@ -264,6 +327,7 @@ export function RideTypeSelectMenu(props, ref) {
       return client.getText('selectMenuLabel');
     }
   }
+
   return (
 
     <div>
@@ -279,7 +343,7 @@ export function RideTypeSelectMenu(props, ref) {
             <LoadingSpinner background='fade' show={isLoading} size='small'>
               <SelectMenu
                 label={getLabel()}
-                disabled={isLoading}
+                disabled={isLoading || isAlreadyRewardsSent}
                 onChange={onMenuOptionSelection}
                 className="selectMenu"
               >
@@ -303,9 +367,9 @@ export function RideTypeSelectMenu(props, ref) {
           </div>
 
           <div>
-            <RadioGroup label="Approval Required?" name="example1" onChange={onApprovalChang} defaultValue={approvalType}>
-              <RadioOption value="yes" label="Yes" />
-              <RadioOption value="no" label="No" />
+            <RadioGroup label="Approval Required?" name="example1" onChange={onApprovalChang} defaultValue={approvalType} value = {approvalType}>
+              <RadioOption value="yes" label="Yes"  disabled = {isAlreadyRewardsSent} />
+              <RadioOption value="no" label="No" disabled = {isAlreadyRewardsSent} />
             </RadioGroup>
           </div>
           <div>
@@ -331,13 +395,14 @@ export function RideTypeSelectMenu(props, ref) {
           {isDateToggled ?
 
             <DateRangePicker
-              startDate={startDate} // momentPropTypes.momentObj or null,
+              startDate={startDate ? moment(startDate) : null} // momentPropTypes.momentObj or null,
               startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
-              endDate={endDate} // momentPropTypes.momentObj or null,
+              endDate={endDate ? moment(endDate) : null} // momentPropTypes.momentObj or null,
               endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
               onDatesChange= {({ startDate, endDate }) => handleDateFilterChange(startDate, endDate)} // PropTypes.func.isRequired,
               focusedInput={startFocused} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
               onFocusChange={focusedInput => setStartFocused(focusedInput)} // PropTypes.func.isRequired,
+              displayFormat = {'DD/MM/YYYY'}
             />
 
             : null}
@@ -359,7 +424,7 @@ export function RideTypeSelectMenu(props, ref) {
           </div>
           {isMaxRewardToggled ?
             <div>
-              <Input className="_2NEGNnn" type="number"  onChange={handleChange}/>
+              <Input className="_2NEGNnn" type="number" value={maxCountValue} placeholder = "eg :50" onChange={handleChange}/>
             </div> :  null}
           <div>
             {maxCountErrorMessage && isMaxRewardToggled &&
