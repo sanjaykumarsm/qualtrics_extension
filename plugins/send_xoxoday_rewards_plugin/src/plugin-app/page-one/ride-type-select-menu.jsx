@@ -77,7 +77,7 @@ export function RideTypeSelectMenu(props, ref) {
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': approvalType === 'yes' ? null : maxCountValue ? maxCountValue : null, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': approvalType === 'yes' ? true : isAllowRepeatRewarding } } },
+            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': (approvalType === 'yes' || !isMaxRewardToggled) ? null : maxCountValue ? maxCountValue : null, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': approvalType === 'yes' ? true : isAllowRepeatRewarding } } },
           };
 
           config.connection = {
@@ -93,16 +93,6 @@ export function RideTypeSelectMenu(props, ref) {
           } else {
             console.log('failed to create automation');
           }
-          // if(result.responseData && result.responseData.data && result.responseData.data && result.responseData.data.getOneClickSiteList) {
-          //   const campaign_res = result.responseData.data.getOneClickSiteList;
-          //   if(campaign_res.success) {
-          //     setMenuOptions(campaign_res.data);
-          //   } else {
-          //     setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
-          //   }
-          // } else {
-          //   setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
-          // }
 
         } catch(error) {
           console.log(error);
@@ -151,7 +141,8 @@ export function RideTypeSelectMenu(props, ref) {
                 let effective_from = campainData.effective_from;
                 let effective_to = campainData.effective_to;
                 let number_of_awards_triggered = campainData.number_of_awards_triggered;
-                setRewardsTriggred(number_of_awards_triggered);
+                let number_of_awards_sent = campainData.number_of_awards_sent;
+                setRewardsTriggred(number_of_awards_sent);
                 setAlreadyRewardsSent(number_of_awards_triggered >= 1 && campainData.additional_details.automation.approval_type ? true : false);
                 setStartDate(effective_from);
                 setEndDate(effective_to);
