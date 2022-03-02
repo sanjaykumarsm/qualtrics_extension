@@ -91,6 +91,10 @@
       "text": "Campaign",
       "context": "The wrapper label for the Select Menu"
     },
+    "linkExpiry": {
+      "text": "Set link expiry",
+      "context": "The wrapper label for the Select Menu"
+    },
     "configCampaign": {
       "text": "Configure campaign",
       "context": "The wrapper label for the Configure campaign"

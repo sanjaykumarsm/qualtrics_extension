@@ -8,12 +8,18 @@ import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
 import moment               from 'moment';
 //import { toUpper } from 'lodash';
+
 export function RideTypeSelectMenu(props, ref) {
   const { client, saveSelection, selectedMenuOption } = props;
   const authConnectionName = client.pluginClientInstance.context.availableConnections[0];
-
+  //const linkExpiryDict = JSON.parse(JSON.stringify(expiryDate));
   // client.pluginClientInstance.context.availableConnections[0];
-
+  const expiryDateDict = [
+    { value: '365', label: '1 year' },
+    { value: '274', label: '9 Months' },
+    { value: '180', label: '6 Months' },
+    { value: '90', label: '3 Months' },
+  ];
   const [ isLoading, setIsLoading ] = useState(true);
   const [ menuErrorMessage, setMenuErrorMessage ] = useState();
   const [ maxCountErrorMessage, setmaxCountErrorMessage ] = useState();
@@ -31,17 +37,16 @@ export function RideTypeSelectMenu(props, ref) {
   const [ approvalType, setApprovalType ] = useState('yes');
   const [ isAlreadyRewardsSent, setAlreadyRewardsSent ] = useState(false);
   const [ rewardsTriggred, setRewardsTriggred ] = useState(0);
+  const [ selectedLinkExpiry, setSelectedLinkExpiry ] = useState('360');
+  const [ defaultLink, setDefaultLink ] = useState({ value: '365', label: '1 year' });
+
   // const [endFocused , setEndFocused] = useState(false);
   const handleChange = e => {
     setMaxValue(e.target.value);
+    //console.log('cfvgbhn', expiryDate);
   };
-  // const [ isDateToggled, setdateToggled ] = useState(false);
-  // const toggledate = () => setdateToggled(!isDateToggled);
 
   useEffect(retrieveSelectMenuOptions, []);
-  // useEffect(getAutomationDetails, []);
-
-  //useEffect(nextPageAction, []);
 
   function nextPageSetup() {
     CreateAndEditAutomation();
@@ -77,7 +82,7 @@ export function RideTypeSelectMenu(props, ref) {
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': (approvalType === 'yes' || !isMaxRewardToggled) ? null : maxCountValue ? maxCountValue : null, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': 90, 'enable_repeat_rewarding': approvalType === 'yes' ? true : isAllowRepeatRewarding } } },
+            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': (approvalType === 'yes' || !isMaxRewardToggled) ? null : maxCountValue ? maxCountValue : null, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': selectedLinkExpiry, 'enable_repeat_rewarding': approvalType === 'yes' ? true : isAllowRepeatRewarding } } },
           };
 
           config.connection = {
@@ -143,7 +148,7 @@ export function RideTypeSelectMenu(props, ref) {
                 let number_of_awards_triggered = campainData.number_of_awards_triggered;
                 let number_of_awards_sent = campainData.number_of_awards_sent;
                 setRewardsTriggred(number_of_awards_sent);
-                setAlreadyRewardsSent(number_of_awards_triggered >= 1 && campainData.additional_details.automation.approval_type ? true : false);
+                setAlreadyRewardsSent(number_of_awards_triggered >= 1 ? true : false);
                 setStartDate(effective_from);
                 setEndDate(effective_to);
                 setMaxValue(max_reward_count_obj >= 1 ? max_reward_count_obj : null);
@@ -165,6 +170,19 @@ export function RideTypeSelectMenu(props, ref) {
                       let enable_repeat_rewarding = redeemLinkObj.enable_repeat_rewarding && campainData.additional_details.automation.approval_type
                         ? true
                         : false;
+                      let batch_expiry_date = redeemLinkObj.batch_expiry_date;
+                      console.log('batch_expiry_date', batch_expiry_date);
+                      console.log('expiryDateDict...', expiryDateDict);
+                      let filteredAutomationDict = expiryDateDict.filter((i) => i.value === '180');
+                      console.log('fcvgbhjnmk', filteredAutomationDict);
+                      setDefaultLink(filteredAutomationDict[0]);
+                      // let obj = {};
+                      // obj.value = filteredAutomationDict[0].value;
+                      // obj.label = filteredAutomationDict[0].label;
+
+                      // setSelectedLinkExpiry(obj.value);
+                      // setDefaultLink(batch_expiry_date);
+
                       setAllowRepeat(enable_repeat_rewarding);
                     } else {
                       let enable_repeat_rewarding = false;
@@ -282,6 +300,10 @@ export function RideTypeSelectMenu(props, ref) {
     setMenuErrorMessage();
   }
 
+  function onLinkExpiry(linkOpt) {
+    setSelectedLinkExpiry(linkOpt);
+  }
+
   function onChangeOfMaxCount()  {
     setMaxRewardToggled(!isMaxRewardToggled);
 
@@ -318,6 +340,7 @@ export function RideTypeSelectMenu(props, ref) {
       return client.getText('selectMenuLabel');
     }
   }
+  console.log('gvhedbhsbdsb', defaultLink);
 
   return (
 
@@ -363,9 +386,37 @@ export function RideTypeSelectMenu(props, ref) {
               <RadioOption value="no" label="No" disabled = {isAlreadyRewardsSent} />
             </RadioGroup>
           </div>
-          <div>
 
+          <div className='linkExpiry'>
+            <div className="selectMenuContainer">
+              <Label className='section-heading'>
+                {client.getText('linkExpiry')}
+              </Label>
+              <SelectMenu
+                //label={getLabel()}
+                defaultLabel={defaultLink.label}
+                defaultValue={defaultLink.label}
+                onChange={onLinkExpiry}
+                className="selectMenu"
+
+              >
+
+                {expiryDateDict.map(expiry => {
+                  return (
+                    <MenuItem
+                      key={expiry.value}
+                      value={expiry.value}
+                    >
+                      {expiry.label}
+                    </MenuItem>
+                  );
+                })}
+              </SelectMenu>
+            </div>
           </div>
+          <div>
+          </div>
+
         </div>
         <div className='floatright'>
           <div className='section-heading'>
