@@ -340,7 +340,7 @@ export function RideTypeSelectMenu(props, ref) {
       return client.getText('selectMenuLabel');
     }
   }
-  console.log('gvhedbhsbdsb', defaultLink);
+
 
   return (
 
