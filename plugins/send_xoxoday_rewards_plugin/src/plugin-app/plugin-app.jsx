@@ -7,7 +7,7 @@ import cloneDeep from 'lodash.clonedeep';
 
 // Internal dependencies
 import { ConfigurationForm } from './page-one/configuration-form.jsx';
-import { IntroductorySection } from './page-one/introductory-section.jsx';
+//import { IntroductorySection } from './page-one/introductory-section.jsx';
 import { RideTypeSelectMenu } from './page-one/ride-type-select-menu.jsx';
 //import { CustomerMessageForm } from './page-two/customer-message-form.jsx';
 import { getDefaultTaskDefinition, formatConnection, formatFormData } from './outbound-http-request-task-definition';
@@ -147,10 +147,10 @@ export function PluginApp(props) {
       case 1:
         return (
           <>
-            <IntroductorySection
+            {/*<IntroductorySection
               client={client}
             >
-            </IntroductorySection>
+            </IntroductorySection> */}
             <RideTypeSelectMenu
               biRef={biRef}
               client={client}

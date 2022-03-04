@@ -7,13 +7,15 @@ import 'react-dates/initialize';
 //import {DateRangePicker} from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
 import moment               from 'moment';
+import Base64 from 'react-native-base64';
 //import { toUpper } from 'lodash';
 
 export function RideTypeSelectMenu(props, ref) {
   const { client, saveSelection, selectedMenuOption } = props;
   const authConnectionName = client.pluginClientInstance.context.availableConnections[0];
   //const linkExpiryDict = JSON.parse(JSON.stringify(expiryDate));
-  // client.pluginClientInstance.context.availableConnections[0];
+  const auth = client.pluginClientInstance.context;
+  console.log('hendjwsamk', auth);
   const expiryDateDict = [
     { value: '365', label: '1 year' },
     { value: '274', label: '9 Months' },
@@ -322,6 +324,57 @@ export function RideTypeSelectMenu(props, ref) {
     setEndDate(endDate);
   }
 
+  function createCampaign() {
+    console.log('create campaign');
+
+    let createCampaignLink = '&createCampaignLink=1';
+    let encryptCreateCampaignLink = Base64.encode(createCampaignLink);
+    (async () => {
+      if(authConnectionName) {
+        try {
+
+          const url = 'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/sso/stores/user';
+          const config = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              'landing_page_custom': '/admin/campaign/?' + encryptCreateCampaignLink
+            }),
+          };
+
+          config.connection = {
+            connectionName: authConnectionName,
+            paramFormat: 'header',
+            paramName: 'Authorization',
+            paramTemplate: 'Bearer %s'
+          };
+          const result = await client.fetch(url, config);
+          console.log(result);
+
+          if(result) {
+            window.open(
+              'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/api' + '/v1/oauth/redirect/stores/' + result.data.ssoToken,
+              '_blank'
+            );
+          } else {
+            console.log('failed to create automation');
+          }
+
+        } catch(error) {
+          console.log(error);
+
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+
+        setIsLoading(false);
+      }
+    }
+    )();
+
+  }
+
   function getLabel() {
     if(isLoading) {
       return selectedMenuOption ? selectedMenuOption.campaignName : client.getText('selectMenuLabel');
@@ -340,19 +393,63 @@ export function RideTypeSelectMenu(props, ref) {
       return client.getText('selectMenuLabel');
     }
   }
-  console.log('gvhedbhsbdsb', defaultLink);
 
   return (
 
     <div>
       <div className='wrap'>
+        <div className='config-campaign'>
+          <div className='heading'>
+          Configure Xoxoday Rewards
+          </div>
+          <span
+            className='helper-text-blue'
+            onClick={() => {
+              console.log('clicked 1');
+            }}
+          >
+            {'click here'} {' '}
+          </span>
+          <span
+            className='helper-text'
+
+          >
+            {'to access Xoxoday Account.'}{' '}
+          </span>
+          <span
+            className='helper-text-blue'
+            onClick={() => {
+              console.log('clicked 3');
+            }}
+            // onClick={this.redirectToCreateCampaign}
+
+          >
+            {'Learn how'}{' '}
+          </span>
+          <span
+            className='helper-text'
+          >
+          to use Xoxodays Qualtrics extension.
+          </span>
+        </div>
         <div className='floatleft'>
-          <div className='section-heading'>
+          <div className='campaign-section-heading '>
             {client.getText('configCampaign')}
           </div>
-          <div className="selectMenuContainer">
-            <Label className='selectMenuWrapperLabel'>
-              {client.getText('selectMenuWrapperLabel')}
+          <div className="selectCampaignContainer">
+            <Label className='helper-text'>
+              {client.getText('selectMenuWrapperLabel')} {' '}
+              <span
+                className='helper-text-blue'
+                onClick={() => {
+                  createCampaign();
+                  console.log('clicked 4');
+                }}
+                // onClick={this.redirectToCreateCampaign}
+
+              >
+          Create New Campaign.
+              </span>
             </Label>
             <LoadingSpinner background='fade' show={isLoading} size='small'>
               <SelectMenu
