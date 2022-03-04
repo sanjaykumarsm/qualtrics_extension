@@ -324,6 +324,56 @@ export function RideTypeSelectMenu(props, ref) {
     setEndDate(endDate);
   }
 
+  function switchToPlum() {
+
+    let createCampaignLink = '&dashboard';
+    let encryptCreateCampaignLink = Base64.encode(createCampaignLink);
+    (async () => {
+      if(authConnectionName) {
+        try {
+
+          const url = 'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/sso/stores/user';
+          const config = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: {
+              'landing_page_custom': '/admin/dashboard/?' + encryptCreateCampaignLink
+            },
+          };
+
+          config.connection = {
+            connectionName: authConnectionName,
+            paramFormat: 'header',
+            paramName: 'Authorization',
+            paramTemplate: 'Bearer %s'
+          };
+          const result = await client.fetch(url, config);
+          console.log(result);
+
+          if(result.responseData && result.responseData.data && result.responseData.data) {
+            window.open(
+              'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/redirect/stores/'  + result.responseData.data.ssoToken,
+              '_blank'
+            );
+          } else {
+            console.log('failed to create automation');
+          }
+
+        } catch(error) {
+          console.log(error);
+
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+
+        setIsLoading(false);
+      }
+    }
+    )();
+
+  }
+
   function createCampaign() {
     console.log('create campaign');
 
@@ -337,9 +387,9 @@ export function RideTypeSelectMenu(props, ref) {
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              'landing_page_custom': '/admin/campaign/?' + encryptCreateCampaignLink
-            }),
+            body: {
+              'landing_page_custom': '/admin/campaign/xoxo-link-campaign/?' + encryptCreateCampaignLink
+            },
           };
 
           config.connection = {
@@ -351,9 +401,9 @@ export function RideTypeSelectMenu(props, ref) {
           const result = await client.fetch(url, config);
           console.log(result);
 
-          if(result) {
+          if(result.responseData && result.responseData.data && result.responseData.data) {
             window.open(
-              'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/api' + '/v1/oauth/redirect/stores/' + result.data.ssoToken,
+              'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/redirect/stores/'  + result.responseData.data.ssoToken,
               '_blank'
             );
           } else {
@@ -405,9 +455,8 @@ export function RideTypeSelectMenu(props, ref) {
           <span
             className='helper-text-blue'
             onClick={() => {
-              console.log('clicked 1');
-            }}
-          >
+              switchToPlum();
+            }}          >
             {'click here'} {' '}
           </span>
           <span
