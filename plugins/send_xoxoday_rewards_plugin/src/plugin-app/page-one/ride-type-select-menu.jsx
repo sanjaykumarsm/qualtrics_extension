@@ -81,8 +81,8 @@ export function RideTypeSelectMenu(props, ref) {
         try {
           const survey_id =  client.pluginClientInstance.context.userMeta.surveyId;
 
-          const start_dateObj = startDate !== '' ? moment(startDate).format('YYYY-MM-DD') : moment(new Date()).format('YYYY-MM-DD');
-          const end_dateObj = endDate !== '' ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
+          const start_dateObj = startDate !== '' && approvalType === 'no' ? moment(startDate).format('YYYY-MM-DD') : moment(new Date()).format('YYYY-MM-DD');
+          const end_dateObj = endDate !== '' && approvalType === 'no' ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
           const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
           const config = {
             method: 'POST',
@@ -266,7 +266,8 @@ export function RideTypeSelectMenu(props, ref) {
   function onApprovalChang(event) {
     setApprovalType(event.target.value);
     setEnableSaveBtn(true);
-    if(event.target.value === 'no') {
+    console.log('evemdsjhewhsy', event);
+    if(event.target.value === 'yes') {
       setMaxRewardToggled(false);
       setAllowRepeat(false);
       setdateToggled(false);
@@ -318,13 +319,13 @@ export function RideTypeSelectMenu(props, ref) {
   function onLinkExpiry(linkOpt) {
     setEnableSaveBtn(true);
     setSelectedLinkExpiry(linkOpt);
-    setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
+    setmaxCountErrorMessage('');
   }
 
   function onChangeOfMaxCount()  {
     setEnableSaveBtn(true);
     setMaxRewardToggled(!isMaxRewardToggled);
-    setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
+    setmaxCountErrorMessage('');
   }
 
   function onChangeOfAllowRepeat()  {
