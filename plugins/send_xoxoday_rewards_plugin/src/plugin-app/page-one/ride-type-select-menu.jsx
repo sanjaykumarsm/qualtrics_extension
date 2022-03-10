@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SelectMenu, MenuItem, LoadingSpinner, Label, RadioGroup, RadioOption, Switch, Input } from '@qualtrics/ui-react';
+import { SelectMenu, MenuItem, LoadingSpinner, Label, RadioGroup, RadioOption, Switch, Input, Button } from '@qualtrics/ui-react';
 import {
   DateRangePicker
 }                           from 'react-dates';
@@ -23,6 +23,7 @@ export function RideTypeSelectMenu(props, ref) {
     { value: '90', label: '3 Months' },
   ];
   const [ isLoading, setIsLoading ] = useState(true);
+  const [ enableSaveBtn, setEnableSaveBtn ] = useState(false);
   const [ menuErrorMessage, setMenuErrorMessage ] = useState();
   const [ maxCountErrorMessage, setmaxCountErrorMessage ] = useState();
   const [ dateMessage, setDateErrorMessage ] = useState();
@@ -45,6 +46,7 @@ export function RideTypeSelectMenu(props, ref) {
   // const [endFocused , setEndFocused] = useState(false);
   const handleChange = e => {
     setMaxValue(e.target.value);
+    setEnableSaveBtn(true);
     //console.log('cfvgbhn', expiryDate);
   };
 
@@ -96,8 +98,10 @@ export function RideTypeSelectMenu(props, ref) {
           const result = await client.fetch(url, config);
           console.log(result);
           if(result && result.responseData && result.responseData.data && result.responseData.data.setupExtensionBasedAutomation &&  result.responseData.data.setupExtensionBasedAutomation.success) {
-            props.moveToNextPage(2);
+            client.enableSaveButton();
+            setEnableSaveBtn(true);
           } else {
+            client.disableSaveButton();
             console.log('failed to create automation');
           }
 
@@ -173,10 +177,7 @@ export function RideTypeSelectMenu(props, ref) {
                         ? true
                         : false;
                       let batch_expiry_date = redeemLinkObj.batch_expiry_date;
-                      console.log('batch_expiry_date', batch_expiry_date);
-                      console.log('expiryDateDict...', expiryDateDict);
-                      let filteredAutomationDict = expiryDateDict.filter((i) => i.value === '180');
-                      console.log('fcvgbhjnmk', filteredAutomationDict);
+                      let filteredAutomationDict = expiryDateDict.filter((i) => i.value === `${batch_expiry_date}`);
                       setDefaultLink(filteredAutomationDict[0]);
                       // let obj = {};
                       // obj.value = filteredAutomationDict[0].value;
@@ -230,23 +231,37 @@ export function RideTypeSelectMenu(props, ref) {
           console.log(JSON.stringify(result));
           if(result.responseData && result.responseData.data && result.responseData.data && result.responseData.data.getOneClickSiteList) {
             const campaign_res = result.responseData.data.getOneClickSiteList;
+            let  campaignOptions = [];
             if(campaign_res.success) {
-              setMenuOptions(campaign_res.data);
-              getAutomationDetails(campaign_res.data);
+
+              campaign_res.data.map((val) => {
+                val.status === 1
+                  ? campaignOptions.push(val)
+                  : null;
+              });
+              console.log('vdgbhsmk,la', campaignOptions);
+              console.log('vdgbhsmka push', campaign_res.data);
+              setMenuOptions(campaignOptions);
+              getAutomationDetails(campaignOptions);
+              setEnableSaveBtn(true);
             } else {
+              setEnableSaveBtn(false);
               setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
             }
           } else {
+            setEnableSaveBtn(false);
             setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
           }
 
         } catch(error) {
           console.log(error);
+          setEnableSaveBtn(false);
           setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
         } finally {
           setIsLoading(false);
         }
       } else {
+        setEnableSaveBtn(false);
         setMenuErrorMessage(client.getText('selectMenuGenericErrorMessage'));
         setIsLoading(false);
       }
@@ -255,7 +270,7 @@ export function RideTypeSelectMenu(props, ref) {
   }
   function onApprovalChang(event) {
     setApprovalType(event.target.value);
-
+    setEnableSaveBtn(true);
     if(event.target.value === 'no') {
       setMaxRewardToggled(false);
       setAllowRepeat(false);
@@ -275,7 +290,8 @@ export function RideTypeSelectMenu(props, ref) {
       return;
     }
     setSelectedCampaign(newSelectedMenuOption);
-    props.toggleSaveButtonState(true);
+    // props.toggleSaveButtonState(true);
+    setEnableSaveBtn(true);
     // Save it to state
     saveSelection(newSelectedMenuOption);
 
@@ -294,7 +310,8 @@ export function RideTypeSelectMenu(props, ref) {
       return;
     }
     setSelectedCampaign(newSelectedMenuOption);
-    props.toggleSaveButtonState(true);
+    //props.toggleSaveButtonState(true);
+    setEnableSaveBtn(true);
     // Save it to state
     saveSelection(newSelectedMenuOption);
 
@@ -303,23 +320,27 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   function onLinkExpiry(linkOpt) {
+    setEnableSaveBtn(true);
     setSelectedLinkExpiry(linkOpt);
   }
 
   function onChangeOfMaxCount()  {
+    setEnableSaveBtn(true);
     setMaxRewardToggled(!isMaxRewardToggled);
 
   }
 
   function onChangeOfAllowRepeat()  {
+    setEnableSaveBtn(true);
     setAllowRepeat(!isAllowRepeatRewarding);
   }
 
   function onDistributeChnage()  {
+    setEnableSaveBtn(true);
     setdateToggled(!isDateToggled);
   }
   function handleDateFilterChange(startDate, endDate) {
-
+    setEnableSaveBtn(true);
     setStartDate(startDate);
     setEndDate(endDate);
   }
@@ -481,160 +502,165 @@ export function RideTypeSelectMenu(props, ref) {
           to use Xoxodays Qualtrics extension.
           </span>
         </div>
-        <div className='floatleft'>
-          <div className='campaign-section-heading '>
-            {client.getText('configCampaign')}
-          </div>
-          <div className="selectCampaignContainer">
-            <Label className='helper-text'>
-              {client.getText('selectMenuWrapperLabel')} {' '}
-              <span
-                className='helper-text-blue'
-                onClick={() => {
-                  createCampaign();
-                  console.log('clicked 4');
-                }}
-                // onClick={this.redirectToCreateCampaign}
+        <div className='config-content'>
+          <div className='floatleft'>
+            <div className='campaign-section-heading '>
+              {client.getText('configCampaign')}
+            </div>
+            <div className="selectCampaignContainer">
+              <Label className='helper-text'>
+                {client.getText('selectMenuWrapperLabel')} {' '}
+                <span
+                  className='helper-text-blue'
+                  onClick={() => {
+                    createCampaign();
+                    console.log('clicked 4');
+                  }}
+                  // onClick={this.redirectToCreateCampaign}
 
-              >
+                >
           Create New Campaign.
-              </span>
-            </Label>
-            <LoadingSpinner background='fade' show={isLoading} size='small'>
-              <SelectMenu
-                label={getLabel()}
-                disabled={isLoading || isAlreadyRewardsSent}
-                onChange={onMenuOptionSelection}
-                className="selectMenu"
-              >
-                {menuOptions.map(menuOption => {
-                  return (
-                    <MenuItem
-                      key={menuOption.campaignId}
-                      value={menuOption.campaignId}
-                    >
-                      {menuOption.campaignName}
-                    </MenuItem>
-                  );
-                })}
-              </SelectMenu>
-            </LoadingSpinner>
-            {menuErrorMessage &&
+                </span>
+              </Label>
+              <LoadingSpinner background='fade' show={isLoading} size='small'>
+                <SelectMenu
+                  label={getLabel()}
+                  disabled={isLoading || isAlreadyRewardsSent}
+                  onChange={onMenuOptionSelection}
+                  className="selectMenu"
+                >
+                  {menuOptions.map(menuOption => {
+                    return (
+                      <MenuItem
+                        key={menuOption.campaignId}
+                        value={menuOption.campaignId}
+                      >
+                        {menuOption.campaignName}
+                      </MenuItem>
+                    );
+                  })}
+                </SelectMenu>
+              </LoadingSpinner>
+              {menuErrorMessage &&
         <div>
           <span>{menuErrorMessage}</span>
         </div>
-            }
-          </div>
-
-          <div>
-            <RadioGroup label="Approval Required?" name="example1" onChange={onApprovalChang} defaultValue={approvalType} value = {approvalType}>
-              <RadioOption value="yes" label="Yes"  disabled = {isAlreadyRewardsSent} />
-              <RadioOption value="no" label="No" disabled = {isAlreadyRewardsSent} />
-            </RadioGroup>
-          </div>
-
-          <div className='linkExpiry'>
-            <div className="selectMenuContainer">
-              <Label className='section-heading'>
-                {client.getText('linkExpiry')}
-              </Label>
-              <SelectMenu
-                //label={getLabel()}
-                defaultLabel={defaultLink.label}
-                defaultValue={defaultLink.label}
-                onChange={onLinkExpiry}
-                className="selectMenu"
-
-              >
-
-                {expiryDateDict.map(expiry => {
-                  return (
-                    <MenuItem
-                      key={expiry.value}
-                      value={expiry.value}
-                    >
-                      {expiry.label}
-                    </MenuItem>
-                  );
-                })}
-              </SelectMenu>
+              }
             </div>
-          </div>
-          <div>
-          </div>
 
-        </div>
-        <div className='floatright'>
-          <div className='section-heading'>
-            {client.getText('additionalSetting')}
+            <div>
+              <RadioGroup label="Approval Required?" name="example1" onChange={onApprovalChang} defaultValue={approvalType} value = {approvalType}>
+                <RadioOption value="yes" label="Yes"  disabled = {isAlreadyRewardsSent} />
+                <RadioOption value="no" label="No" disabled = {isAlreadyRewardsSent} />
+              </RadioGroup>
+            </div>
+
+            <div className='linkExpiry'>
+              <div className="selectMenuContainer">
+                <Label className='section-heading'>
+                  {client.getText('linkExpiry')}
+                </Label>
+                <SelectMenu
+                //label={getLabel()}
+                  defaultLabel={defaultLink.label}
+                  defaultValue={defaultLink.label}
+                  onChange={onLinkExpiry}
+                  className="selectMenu"
+
+                >
+
+                  {expiryDateDict.map(expiry => {
+                    return (
+                      <MenuItem
+                        key={expiry.value}
+                        value={expiry.value}
+                      >
+                        {expiry.label}
+                      </MenuItem>
+                    );
+                  })}
+                </SelectMenu>
+              </div>
+            </div>
+            <div>
+            </div>
+
           </div>
-          <div
-            style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
-          >
-            <h4 className='section-description'>
+          <div className='floatright'>
+            <div className='section-heading'>
+              {client.getText('additionalSetting')}
+            </div>
+            <div
+              style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
+            >
+              <h4 className='section-description'>
         Set automation date range{' '}
-              <p className='sub-section-description'>
+                <p className='sub-section-description'>
           Select the duration for which the reward automation will be active. {' '}
-              </p>
-            </h4>
+                </p>
+              </h4>
 
-            <Switch style={{ marginTop: 12 }} onChange={onDistributeChnage} disabled = {approvalType === 'yes' ? true : false} checked = {isDateToggled}/>
-          </div>
-          {isDateToggled ?
+              <Switch style={{ marginTop: 12 }} onChange={onDistributeChnage} disabled = {approvalType === 'yes' ? true : false} checked = {isDateToggled}/>
+            </div>
+            {isDateToggled ?
 
-            <DateRangePicker
-              startDate={startDate ? moment(startDate) : null} // momentPropTypes.momentObj or null,
-              startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
-              endDate={endDate ? moment(endDate) : null} // momentPropTypes.momentObj or null,
-              endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
-              onDatesChange= {({ startDate, endDate }) => handleDateFilterChange(startDate, endDate)} // PropTypes.func.isRequired,
-              focusedInput={startFocused} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
-              onFocusChange={focusedInput => setStartFocused(focusedInput)} // PropTypes.func.isRequired,
-              displayFormat = {'DD/MM/YYYY'}
-            />
+              <DateRangePicker
+                startDate={startDate ? moment(startDate) : null} // momentPropTypes.momentObj or null,
+                startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
+                endDate={endDate ? moment(endDate) : null} // momentPropTypes.momentObj or null,
+                endDateId="your_unique_end_date_id" // PropTypes.string.isRequired,
+                onDatesChange= {({ startDate, endDate }) => handleDateFilterChange(startDate, endDate)} // PropTypes.func.isRequired,
+                focusedInput={startFocused} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
+                onFocusChange={focusedInput => setStartFocused(focusedInput)} // PropTypes.func.isRequired,
+                displayFormat = {'DD/MM/YYYY'}
+              />
 
-            : null}
-          {dateMessage && isDateToggled &&
+              : null}
+            {dateMessage && isDateToggled &&
               <div>
                 <span className='errorMsg'>{dateMessage}</span>
               </div>
-          }
-          <div
-            style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
-          >
-            <h4 className='section-description'>
+            }
+            <div
+              style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
+            >
+              <h4 className='section-description'>
             Set maximum reward count{' '}
-              <p className='sub-section-description'>
+                <p className='sub-section-description'>
               Define the maximum number of rewards that will be sent out automatically. {' '}
-              </p>
-            </h4>
-            <Switch style={{ marginTop: 12 }} onChange={onChangeOfMaxCount} disabled = {approvalType === 'yes' ? true : false} checked = {isMaxRewardToggled}/>
-          </div>
-          {isMaxRewardToggled ?
+                </p>
+              </h4>
+              <Switch style={{ marginTop: 12 }} onChange={onChangeOfMaxCount} disabled = {approvalType === 'yes' ? true : false} checked = {isMaxRewardToggled}/>
+            </div>
+            {isMaxRewardToggled ?
+              <div>
+                <Input className="_2NEGNnn" type="number" value={maxCountValue} placeholder = "eg :50" onChange={handleChange}/>
+              </div> :  null}
             <div>
-              <Input className="_2NEGNnn" type="number" value={maxCountValue} placeholder = "eg :50" onChange={handleChange}/>
-            </div> :  null}
-          <div>
-            {maxCountErrorMessage && isMaxRewardToggled &&
+              {maxCountErrorMessage && isMaxRewardToggled &&
             <div>
               <span className='errorMsg'>{maxCountErrorMessage}</span>
             </div>
-            }
-          </div>
-          <div
-            style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
-          >
-            <h4 className='section-description'>
+              }
+            </div>
+            <div
+              style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
+            >
+              <h4 className='section-description'>
             Allow repeat rewarding{' '}
-              <p className='sub-section-description'>
+                <p className='sub-section-description'>
               On enabling repeat rewarding, the same person can recieve rewards multiple times.  {' '}
-              </p>
-            </h4>
+                </p>
+              </h4>
 
-            <Switch style={{ marginTop: 12 }} onChange={onChangeOfAllowRepeat} disabled = {approvalType === 'yes' ? true : false} checked = {isAllowRepeatRewarding}/>
+              <Switch style={{ marginTop: 12 }} onChange={onChangeOfAllowRepeat} disabled = {approvalType === 'yes' ? true : false} checked = {isAllowRepeatRewarding}/>
+
+            </div>
 
           </div>
-
+        </div>
+        <div className='text-center'>
+          <Button disabled={!enableSaveBtn  || selectedCampaign.length === 0} className="save-btn" onClick={CreateAndEditAutomation}>Save</Button>
         </div>
       </div>
 

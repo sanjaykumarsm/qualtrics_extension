@@ -40,7 +40,7 @@ export function PluginApp(props) {
   }, [ taskDefinition ]);
 
   useEffect(() => {
-    client.onNext(page => nextPageSetup(page));
+    client.onNext(page => setPageNum(page));
     client.onBack(page => setPageNum(page));
   }, []);
 
@@ -54,10 +54,10 @@ export function PluginApp(props) {
     </div>
   );
 
-  function nextPageSetup(page) {
-    biRef.nextPageSetup();
-    //from call
-  }
+  // function nextPageSetup(page) {
+  //   biRef.nextPageSetup();
+  //   //from call
+  // }
 
   /////////////////////////////////////////////
   /////////////   Hook Handlers   /////////////
@@ -157,7 +157,6 @@ export function PluginApp(props) {
               selectedMenuOption={taskDefinition.config.selectedMenuOption}
               toggleSaveButtonState={toggleSaveButtonState}
               saveSelection={saveSelection}
-              moveToNextPage = {moveToNextPage}
             >
             </RideTypeSelectMenu>
 
@@ -175,9 +174,9 @@ export function PluginApp(props) {
         );
     }
   }
-  function moveToNextPage(page) {
-    setPageNum(page);
-  }
+  // function moveToNextPage(page) {
+  //   setPageNum(page);
+  // }
   function attachFormFieldsToTaskDefinition(formFields) {
     const updatedTaskDefinition = cloneDeep(taskDefinition);
     updatedTaskDefinition.config.formFields = formFields;
