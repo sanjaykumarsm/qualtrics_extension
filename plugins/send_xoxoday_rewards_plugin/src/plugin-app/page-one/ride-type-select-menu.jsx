@@ -47,6 +47,7 @@ export function RideTypeSelectMenu(props, ref) {
   const handleChange = e => {
     setMaxValue(e.target.value);
     setEnableSaveBtn(true);
+    setmaxCountErrorMessage('');
     //console.log('cfvgbhn', expiryDate);
   };
 
@@ -178,13 +179,7 @@ export function RideTypeSelectMenu(props, ref) {
                         : false;
                       let batch_expiry_date = redeemLinkObj.batch_expiry_date;
                       let filteredAutomationDict = expiryDateDict.filter((i) => i.value === `${batch_expiry_date}`);
-                      setDefaultLink(filteredAutomationDict[0]);
-                      // let obj = {};
-                      // obj.value = filteredAutomationDict[0].value;
-                      // obj.label = filteredAutomationDict[0].label;
-
-                      // setSelectedLinkExpiry(obj.value);
-                      // setDefaultLink(batch_expiry_date);
+                      setDefaultLink(filteredAutomationDict.length !== 0 ? filteredAutomationDict[0] : { value: '365', label: '1 year' });
 
                       setAllowRepeat(enable_repeat_rewarding);
                     } else {
@@ -279,6 +274,7 @@ export function RideTypeSelectMenu(props, ref) {
 
   }
   function selectedAutomationCampaign(menuOptionId, menuOptionObj) {
+    console.log('hdenjwsqaw', menuOptionId, menuOptionObj);
     // find the the selection
     const newSelectedMenuOption = menuOptionObj.find((menuOption) => {
       return menuOption.campaignId === menuOptionId;
@@ -322,12 +318,13 @@ export function RideTypeSelectMenu(props, ref) {
   function onLinkExpiry(linkOpt) {
     setEnableSaveBtn(true);
     setSelectedLinkExpiry(linkOpt);
+    setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
   }
 
   function onChangeOfMaxCount()  {
     setEnableSaveBtn(true);
     setMaxRewardToggled(!isMaxRewardToggled);
-
+    setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
   }
 
   function onChangeOfAllowRepeat()  {
@@ -343,6 +340,7 @@ export function RideTypeSelectMenu(props, ref) {
     setEnableSaveBtn(true);
     setStartDate(startDate);
     setEndDate(endDate);
+    setDateErrorMessage('');
   }
 
   function switchToPlum() {
@@ -489,7 +487,8 @@ export function RideTypeSelectMenu(props, ref) {
           <span
             className='helper-text-blue'
             onClick={() => {
-              console.log('clicked 3');
+
+              window.open('https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/redirect/stores/', '_blank');
             }}
             // onClick={this.redirectToCreateCampaign}
 
