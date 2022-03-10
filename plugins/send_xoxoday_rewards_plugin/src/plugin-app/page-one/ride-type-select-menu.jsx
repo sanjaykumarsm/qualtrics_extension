@@ -15,6 +15,7 @@ export function RideTypeSelectMenu(props, ref) {
   const authConnectionName = client.pluginClientInstance.context.availableConnections[0];
   //const linkExpiryDict = JSON.parse(JSON.stringify(expiryDate));
   const auth = client.pluginClientInstance.context;
+  console.log(auth);
   const expiryDateDict = [
     { value: '365', label: '1 year' },
     { value: '274', label: '9 Months' },
