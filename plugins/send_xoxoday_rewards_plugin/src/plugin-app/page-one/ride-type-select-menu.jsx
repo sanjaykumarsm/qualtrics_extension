@@ -15,13 +15,13 @@ export function RideTypeSelectMenu(props, ref) {
   const authConnectionName = client.pluginClientInstance.context.availableConnections[0];
   //const linkExpiryDict = JSON.parse(JSON.stringify(expiryDate));
   const auth = client.pluginClientInstance.context;
-  console.log('hendjwsamk', auth);
   const expiryDateDict = [
     { value: '365', label: '1 year' },
     { value: '274', label: '9 Months' },
     { value: '180', label: '6 Months' },
     { value: '90', label: '3 Months' },
   ];
+  const [ isCreateAutoLoading, setCreateAutoLoading ] = useState(false);
   const [ isLoading, setIsLoading ] = useState(true);
   const [ enableSaveBtn, setEnableSaveBtn ] = useState(false);
   const [ menuErrorMessage, setMenuErrorMessage ] = useState();
@@ -42,12 +42,16 @@ export function RideTypeSelectMenu(props, ref) {
   const [ rewardsTriggred, setRewardsTriggred ] = useState(0);
   const [ selectedLinkExpiry, setSelectedLinkExpiry ] = useState('360');
   const [ defaultLink, setDefaultLink ] = useState({ value: '365', label: '1 year' });
+  const [ pageErrorMsg, setPageErrorMsg ] = useState();
+  const [ ispageError, setPageError ] = useState(false);
+  const [ isAutomationCreate, setAutomatioCreated ] = useState(false);
 
   // const [endFocused , setEndFocused] = useState(false);
   const handleChange = e => {
     setMaxValue(e.target.value);
     setEnableSaveBtn(true);
     setmaxCountErrorMessage('');
+    setAutomatioCreated(false);
     //console.log('cfvgbhn', expiryDate);
   };
 
@@ -58,6 +62,8 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   function CreateAndEditAutomation() {
+    setPageError(false);
+    setAutomatioCreated(false);
     if(isDateToggled && approvalType === 'no') {
       if(startDate === '') {
         setDateErrorMessage('Start date can not be empty');
@@ -80,7 +86,7 @@ export function RideTypeSelectMenu(props, ref) {
       if(authConnectionName) {
         try {
           const survey_id =  client.pluginClientInstance.context.userMeta.surveyId;
-
+          setCreateAutoLoading(true);
           const start_dateObj = startDate !== '' && approvalType === 'no' ? moment(startDate).format('YYYY-MM-DD') : moment(new Date()).format('YYYY-MM-DD');
           const end_dateObj = endDate !== '' && approvalType === 'no' ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
           const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
@@ -98,12 +104,16 @@ export function RideTypeSelectMenu(props, ref) {
           };
           const result = await client.fetch(url, config);
           console.log(result);
+          setCreateAutoLoading(false);
           if(result && result.responseData && result.responseData.data && result.responseData.data.setupExtensionBasedAutomation &&  result.responseData.data.setupExtensionBasedAutomation.success) {
             client.enableSaveButton();
             setEnableSaveBtn(true);
+            setAutomatioCreated(true);
           } else {
             client.disableSaveButton();
-            console.log('failed to create automation');
+            setPageError(false);
+            setPageErrorMsg(result.responseData.data.setupExtensionBasedAutomation.message ? result.responseData.data.setupExtensionBasedAutomation.message  : 'failed to create automation');
+            setAutomatioCreated(false);
           }
 
         } catch(error) {
@@ -142,7 +152,6 @@ export function RideTypeSelectMenu(props, ref) {
           const result = await client.fetch(url, config);
           if(result && result.responseData && result.responseData.data && result.responseData.data.getAutomationBySurveyId &&  result.responseData.data.getAutomationBySurveyId.success) {
             let campainData = result.responseData.data.getAutomationBySurveyId.data[0];
-
             if(campainData) {
               setAutomationDetails(campainData);
               console.log(automationDetails);
@@ -264,6 +273,7 @@ export function RideTypeSelectMenu(props, ref) {
     )();
   }
   function onApprovalChang(event) {
+    setAutomatioCreated(false);
     setApprovalType(event.target.value);
     setEnableSaveBtn(true);
     console.log('evemdsjhewhsy', event);
@@ -296,6 +306,7 @@ export function RideTypeSelectMenu(props, ref) {
     setMenuErrorMessage();
   }
   function onMenuOptionSelection(menuOptionId) {
+    setAutomatioCreated(false);
     // find the the selection
     const newSelectedMenuOption = menuOptions.find((menuOption) => {
       return menuOption.campaignId === menuOptionId;
@@ -317,27 +328,32 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   function onLinkExpiry(linkOpt) {
+    setAutomatioCreated(false);
     setEnableSaveBtn(true);
     setSelectedLinkExpiry(linkOpt);
     setmaxCountErrorMessage('');
   }
 
   function onChangeOfMaxCount()  {
+    setAutomatioCreated(false);
     setEnableSaveBtn(true);
     setMaxRewardToggled(!isMaxRewardToggled);
     setmaxCountErrorMessage('');
   }
 
   function onChangeOfAllowRepeat()  {
+    setAutomatioCreated(false);
     setEnableSaveBtn(true);
     setAllowRepeat(!isAllowRepeatRewarding);
   }
 
   function onDistributeChnage()  {
+    setAutomatioCreated(false);
     setEnableSaveBtn(true);
     setdateToggled(!isDateToggled);
   }
   function handleDateFilterChange(startDate, endDate) {
+    setAutomatioCreated(false);
     setEnableSaveBtn(true);
     setStartDate(startDate);
     setEndDate(endDate);
@@ -345,7 +361,7 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   function switchToPlum() {
-
+    setAutomatioCreated(false);
     let createCampaignLink = '&dashboard';
     let encryptCreateCampaignLink = Base64.encode(createCampaignLink);
     (async () => {
@@ -395,6 +411,7 @@ export function RideTypeSelectMenu(props, ref) {
   }
 
   function createCampaign() {
+    setAutomatioCreated(false);
     console.log('create campaign');
 
     let createCampaignLink = '&createCampaignLink=1';
@@ -468,6 +485,11 @@ export function RideTypeSelectMenu(props, ref) {
 
     <div>
       <div className='wrap'>
+        {ispageError ? <div className='error-Banner'>
+          <div className='error-banner-text'>
+            {pageErrorMsg}
+          </div>
+        </div> : null}
         <div className='config-campaign'>
           <div className='heading'>
           Configure Xoxoday Rewards
@@ -660,10 +682,9 @@ export function RideTypeSelectMenu(props, ref) {
           </div>
         </div>
         <div className='text-center'>
-          <Button disabled={!enableSaveBtn  || selectedCampaign.length === 0} className="save-btn" onClick={CreateAndEditAutomation}>Save</Button>
+          <Button disabled={!enableSaveBtn  || selectedCampaign.length === 0} className="save-btn" onClick={CreateAndEditAutomation}>{isCreateAutoLoading ? <LoadingSpinner background='fade' show={isCreateAutoLoading} size='small'></LoadingSpinner> : isAutomationCreate ? 'Saved' : 'Save'  }</Button>
         </div>
       </div>
-
     </div>
   );
 }
