@@ -24,6 +24,8 @@ export function RideTypeSelectMenu(props, ref) {
   ];
   const [ isCreateAutoLoading, setCreateAutoLoading ] = useState(false);
   const [ isLoading, setIsLoading ] = useState(true);
+  const [ isLinkExpLoading, setisLinkExpLoading ] = useState(true);
+
   const [ enableSaveBtn, setEnableSaveBtn ] = useState(false);
   const [ menuErrorMessage, setMenuErrorMessage ] = useState();
   const [ maxCountErrorMessage, setmaxCountErrorMessage ] = useState();
@@ -104,15 +106,15 @@ export function RideTypeSelectMenu(props, ref) {
             paramTemplate: 'Bearer %s'
           };
           const result = await client.fetch(url, config);
-          console.log(result);
           setCreateAutoLoading(false);
           if(result && result.responseData && result.responseData.data && result.responseData.data.setupExtensionBasedAutomation &&  result.responseData.data.setupExtensionBasedAutomation.success) {
             client.enableSaveButton();
-            setEnableSaveBtn(true);
+            setEnableSaveBtn(false);
             setAutomatioCreated(true);
           } else {
             client.disableSaveButton();
-            setPageError(false);
+            setEnableSaveBtn(true);
+            setPageError(true);
             setPageErrorMsg(result.responseData.data.setupExtensionBasedAutomation.message ? result.responseData.data.setupExtensionBasedAutomation.message  : 'failed to create automation');
             setAutomatioCreated(false);
           }
@@ -135,6 +137,7 @@ export function RideTypeSelectMenu(props, ref) {
   function getAutomationDetails(campaignObj) {
     (async () => {
       if(authConnectionName) {
+        setisLinkExpLoading(true);
         try {
 
           const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
@@ -153,6 +156,8 @@ export function RideTypeSelectMenu(props, ref) {
           const result = await client.fetch(url, config);
           if(result && result.responseData && result.responseData.data && result.responseData.data.getAutomationBySurveyId &&  result.responseData.data.getAutomationBySurveyId.success) {
             let campainData = result.responseData.data.getAutomationBySurveyId.data[0];
+            setEnableSaveBtn(false);
+            client.disableSaveButton();
             if(campainData) {
               setAutomationDetails(campainData);
               console.log(automationDetails);
@@ -190,7 +195,7 @@ export function RideTypeSelectMenu(props, ref) {
                       let batch_expiry_date = redeemLinkObj.batch_expiry_date;
                       let filteredAutomationDict = expiryDateDict.filter((i) => i.value === `${batch_expiry_date}`);
                       setDefaultLink(filteredAutomationDict.length !== 0 ? filteredAutomationDict[0] : { value: '365', label: '1 year' });
-
+                      setisLinkExpLoading(false);
                       setAllowRepeat(enable_repeat_rewarding);
                     } else {
                       let enable_repeat_rewarding = false;
@@ -201,6 +206,7 @@ export function RideTypeSelectMenu(props, ref) {
               }
             }
           } else {
+            setisLinkExpLoading(false);
             console.log('error in loading automation details');
           }
         } catch(error) {
@@ -299,7 +305,7 @@ export function RideTypeSelectMenu(props, ref) {
     }
     setSelectedCampaign(newSelectedMenuOption);
     // props.toggleSaveButtonState(true);
-    setEnableSaveBtn(true);
+    // setEnableSaveBtn(true);
     // Save it to state
     saveSelection(newSelectedMenuOption);
 
@@ -491,6 +497,9 @@ export function RideTypeSelectMenu(props, ref) {
             {pageErrorMsg}
           </div>
         </div> : null}
+        <div className='text-center'>
+          <Button disabled={ selectedCampaign.length === 0 ? true : !enableSaveBtn  } className="save-btn" kind='primary' onClick={CreateAndEditAutomation}>{isCreateAutoLoading ? <LoadingSpinner background='fade' show={isCreateAutoLoading} size='small'></LoadingSpinner> : isAutomationCreate ? 'Saved' : 'Save'  }</Button>
+        </div>
         <div className='config-campaign'>
           <div className='heading'>
           Configure Xoxoday Rewards
@@ -512,7 +521,7 @@ export function RideTypeSelectMenu(props, ref) {
             className='helper-text-blue'
             onClick={() => {
 
-              window.open('https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/redirect/stores/', '_blank');
+              window.open('https://help.xoxoday.com/plum/user-guide/integrations/qualtrics/workflow-extension', '_blank');
             }}
             // onClick={this.redirectToCreateCampaign}
 
@@ -583,26 +592,30 @@ export function RideTypeSelectMenu(props, ref) {
                 <Label className='section-heading'>
                   {client.getText('linkExpiry')}
                 </Label>
-                <SelectMenu
-                //label={getLabel()}
-                  defaultLabel={defaultLink.label}
-                  defaultValue={defaultLink.label}
-                  onChange={onLinkExpiry}
-                  className="selectMenu"
+                <LoadingSpinner background='fade' show={isLinkExpLoading} size='small'>
+                  <SelectMenu
+                    //label={getLabel()}
+                    defaultLabel={defaultLink.label}
+                    defaultValue={defaultLink.label}
+                    onChange={onLinkExpiry}
+                    className="selectMenu"
+                    disabled={isLinkExpLoading }
 
-                >
+                  >
 
-                  {expiryDateDict.map(expiry => {
-                    return (
-                      <MenuItem
-                        key={expiry.value}
-                        value={expiry.value}
-                      >
-                        {expiry.label}
-                      </MenuItem>
-                    );
-                  })}
-                </SelectMenu>
+                    {expiryDateDict.map(expiry => {
+                      return (
+                        <MenuItem
+                          key={expiry.value}
+                          value={expiry.value}
+                        >
+                          {expiry.label}
+                        </MenuItem>
+                      );
+                    })}
+                  </SelectMenu>
+                </LoadingSpinner>
+
               </div>
             </div>
             <div>
@@ -681,9 +694,6 @@ export function RideTypeSelectMenu(props, ref) {
             </div>
 
           </div>
-        </div>
-        <div className='text-center'>
-          <Button disabled={!enableSaveBtn  || selectedCampaign.length === 0} className="save-btn" onClick={CreateAndEditAutomation}>{isCreateAutoLoading ? <LoadingSpinner background='fade' show={isCreateAutoLoading} size='small'></LoadingSpinner> : isAutomationCreate ? 'Saved' : 'Save'  }</Button>
         </div>
       </div>
     </div>

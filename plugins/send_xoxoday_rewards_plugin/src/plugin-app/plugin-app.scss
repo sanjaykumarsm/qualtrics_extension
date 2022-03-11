@@ -120,17 +120,13 @@
     padding-top: 15px;
   }
   .save-btn{
-    background-color: #A50D4F;
-    color: white;
-    width: 200px;
+   
+    width: 100px;
     height: 36px;
-    &.hover {
-      background-color: #A50D4F;
-      color: #fff;
-    }
+   
   }
   .text-center{
-    text-align: center;
+    text-align: right;
   }
   .config-content{
     height: 450px;
