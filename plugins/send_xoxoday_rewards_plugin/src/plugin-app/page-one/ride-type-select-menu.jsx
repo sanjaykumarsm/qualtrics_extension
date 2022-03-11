@@ -91,7 +91,7 @@ export function RideTypeSelectMenu(props, ref) {
           const survey_id =  client.pluginClientInstance.context.userMeta.surveyId;
           setCreateAutoLoading(true);
           const start_dateObj = startDate !== '' && approvalType === 'no' ? moment(startDate).format('YYYY-MM-DD') : moment(new Date()).format('YYYY-MM-DD');
-          const end_dateObj = endDate !== '' && approvalType === 'no' ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
+          const end_dateObj = endDate !== '' && approvalType === 'no' && isDateToggled ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
           const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
           const config = {
             method: 'POST',
