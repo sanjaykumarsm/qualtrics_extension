@@ -24,7 +24,7 @@ export function RideTypeSelectMenu(props, ref) {
   ];
   const [ isCreateAutoLoading, setCreateAutoLoading ] = useState(false);
   const [ isLoading, setIsLoading ] = useState(true);
-  const [ isLinkExpLoading, setisLinkExpLoading ] = useState(true);
+  const [ isLinkExpLoading, setisLinkExpLoading ] = useState(false);
 
   const [ enableSaveBtn, setEnableSaveBtn ] = useState(false);
   const [ menuErrorMessage, setMenuErrorMessage ] = useState();
@@ -155,6 +155,9 @@ export function RideTypeSelectMenu(props, ref) {
           };
           const result = await client.fetch(url, config);
           if(result && result.responseData && result.responseData.data && result.responseData.data.getAutomationBySurveyId &&  result.responseData.data.getAutomationBySurveyId.success) {
+            if(result.responseData.data.getAutomationBySurveyId.data.length === 0) {
+              setisLinkExpLoading(false);
+            }
             let campainData = result.responseData.data.getAutomationBySurveyId.data[0];
             setEnableSaveBtn(false);
             client.disableSaveButton();
@@ -221,6 +224,7 @@ export function RideTypeSelectMenu(props, ref) {
     )();
   }
   function retrieveSelectMenuOptions() {
+    client.disableSaveButton();
     (async () => {
       if(authConnectionName) {
         try {
