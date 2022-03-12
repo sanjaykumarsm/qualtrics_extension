@@ -215,9 +215,11 @@ export function RideTypeSelectMenu(props, ref) {
         } catch(error) {
           console.log(error);
         } finally {
+          setisLinkExpLoading(false);
           setIsLoading(false);
         }
       } else {
+        setisLinkExpLoading(false);
         setIsLoading(false);
       }
     }
