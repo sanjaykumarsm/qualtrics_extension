@@ -88,7 +88,7 @@
       "context": "The label for the Select Menu or dropdown"
     },
     "selectMenuWrapperLabel": {
-      "text": "Campaign",
+      "text": "Select a campaign from the list of available campaigns or",
       "context": "The wrapper label for the Select Menu"
     },
     "linkExpiry": {
@@ -96,7 +96,7 @@
       "context": "The wrapper label for the Select Menu"
     },
     "configCampaign": {
-      "text": "Configure campaign",
+      "text": "Select campaign",
       "context": "The wrapper label for the Configure campaign"
     },
     "additionalSetting": {

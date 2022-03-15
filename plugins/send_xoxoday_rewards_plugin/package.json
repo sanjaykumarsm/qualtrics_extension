@@ -28,6 +28,7 @@
     "react-datepicker": "^4.6.0",
     "react-dates": "^21.8.0",
     "react-dom": "^16.14.0",
+    "react-native-base64": "^0.2.1",
     "string-replace-loader": "^2.2.0",
     "uuid": "^8.3.2"
   },

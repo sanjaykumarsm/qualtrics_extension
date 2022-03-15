@@ -23,6 +23,35 @@
     color: #32363A;
     margin-bottom: 8px;
   }
+  .campaign-section-heading {
+    font-weight: regular;
+    font-size: 18px;
+    color: #32363A;
+    margin-bottom: 5px;
+  }
+  .config-campaign{
+    margin-bottom: 10px;
+  }
+  .heading{
+    font-weight: regular;
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 32px;
+    color: #252A31;
+  }
+  .helper-text-blue{
+    font-size: 10px;
+    line-height: 16px;
+    font-weight: regular;
+    color: #0172CB;
+    cursor: pointer;
+  }
+  .helper-text{
+    font-size: 10px;
+    line-height: 16px;
+    font-weight: regular;
+    color: #252A31;
+  }
 
   .section-content {
     font-weight: regular;
@@ -35,6 +64,11 @@
     padding-bottom: 20px;
     display: flex;
     flex-direction: column;
+  }
+  .selectCampaignContainer {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
   }
   .selectMenuWrapperLabel {
     color: #74777A;
@@ -85,4 +119,31 @@
   .linkExpiry{
     padding-top: 15px;
   }
+  .save-btn{
+   
+    width: 100px;
+    height: 36px;
+   
+  }
+  .text-center{
+    text-align: right;
+  }
+  .config-content{
+    height: 450px;
+  }
+  .error-Banner{
+    border-radius: 4px;
+    background-color: #FFF4F4;
+    border: 1px #BB0000;
+    height: 30px;
+    border-style: solid;
+    margin-bottom: 10px;
+  }
+  .error-banner-text{
+    font-size: 14px;
+    color: #32363A;
+    line-height: 30px;
+    padding-left: 10px;
+  }
+
 }

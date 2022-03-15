@@ -7,7 +7,7 @@ import cloneDeep from 'lodash.clonedeep';
 
 // Internal dependencies
 import { ConfigurationForm } from './page-one/configuration-form.jsx';
-import { IntroductorySection } from './page-one/introductory-section.jsx';
+//import { IntroductorySection } from './page-one/introductory-section.jsx';
 import { RideTypeSelectMenu } from './page-one/ride-type-select-menu.jsx';
 //import { CustomerMessageForm } from './page-two/customer-message-form.jsx';
 import { getDefaultTaskDefinition, formatConnection, formatFormData } from './outbound-http-request-task-definition';
@@ -40,7 +40,7 @@ export function PluginApp(props) {
   }, [ taskDefinition ]);
 
   useEffect(() => {
-    client.onNext(page => nextPageSetup(page));
+    client.onNext(page => setPageNum(page));
     client.onBack(page => setPageNum(page));
   }, []);
 
@@ -54,10 +54,10 @@ export function PluginApp(props) {
     </div>
   );
 
-  function nextPageSetup(page) {
-    biRef.nextPageSetup();
-    //from call
-  }
+  // function nextPageSetup(page) {
+  //   biRef.nextPageSetup();
+  //   //from call
+  // }
 
   /////////////////////////////////////////////
   /////////////   Hook Handlers   /////////////
@@ -147,17 +147,16 @@ export function PluginApp(props) {
       case 1:
         return (
           <>
-            <IntroductorySection
+            {/*<IntroductorySection
               client={client}
             >
-            </IntroductorySection>
+            </IntroductorySection> */}
             <RideTypeSelectMenu
               biRef={biRef}
               client={client}
               selectedMenuOption={taskDefinition.config.selectedMenuOption}
               toggleSaveButtonState={toggleSaveButtonState}
               saveSelection={saveSelection}
-              moveToNextPage = {moveToNextPage}
             >
             </RideTypeSelectMenu>
 
@@ -175,9 +174,9 @@ export function PluginApp(props) {
         );
     }
   }
-  function moveToNextPage(page) {
-    setPageNum(page);
-  }
+  // function moveToNextPage(page) {
+  //   setPageNum(page);
+  // }
   function attachFormFieldsToTaskDefinition(formFields) {
     const updatedTaskDefinition = cloneDeep(taskDefinition);
     updatedTaskDefinition.config.formFields = formFields;
