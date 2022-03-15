@@ -10,12 +10,15 @@ import moment               from 'moment';
 import Base64 from 'react-native-base64';
 //import { toUpper } from 'lodash';
 
+import configration from '../../../config.json';
+
 export function RideTypeSelectMenu(props, ref) {
   const { client, saveSelection, selectedMenuOption } = props;
   const authConnectionName = client.pluginClientInstance.context.availableConnections[0];
   //const linkExpiryDict = JSON.parse(JSON.stringify(expiryDate));
   const auth = client.pluginClientInstance.context;
   console.log(auth);
+  console.log('hnsjakmjdes', configration);
   const expiryDateDict = [
     { value: '365', label: '1 year' },
     { value: '274', label: '9 Months' },
@@ -92,7 +95,7 @@ export function RideTypeSelectMenu(props, ref) {
           setCreateAutoLoading(true);
           const start_dateObj = startDate !== '' && approvalType === 'no' ? moment(startDate).format('YYYY-MM-DD') : moment(new Date()).format('YYYY-MM-DD');
           const end_dateObj = endDate !== '' && approvalType === 'no' && isDateToggled ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
-          const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
+          const url = configration.auth_url;
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -140,7 +143,7 @@ export function RideTypeSelectMenu(props, ref) {
         setisLinkExpLoading(true);
         try {
 
-          const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
+          const url = configration.auth_url;
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -230,8 +233,7 @@ export function RideTypeSelectMenu(props, ref) {
     (async () => {
       if(authConnectionName) {
         try {
-
-          const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
+          const url = configration.auth_url;
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -245,7 +247,6 @@ export function RideTypeSelectMenu(props, ref) {
             paramTemplate: 'Bearer %s'
           };
           const result = await client.fetch(url, config);
-          console.log(JSON.stringify(result));
           if(result.responseData && result.responseData.data && result.responseData.data && result.responseData.data.getOneClickSiteList) {
             const campaign_res = result.responseData.data.getOneClickSiteList;
             let  campaignOptions = [];
@@ -256,8 +257,6 @@ export function RideTypeSelectMenu(props, ref) {
                   ? campaignOptions.push(val)
                   : null;
               });
-              console.log('vdgbhsmk,la', campaignOptions);
-              console.log('vdgbhsmka push', campaign_res.data);
               setMenuOptions(campaignOptions);
               getAutomationDetails(campaignOptions);
               setEnableSaveBtn(true);
