@@ -1,15 +1,15 @@
 {
     "connections": [
         {
-            "clientCredentialId": "CREG_SkuXzN9s8xa3nR",
-            "name": "s100_oauth2_scope",
+            "clientCredentialId": "CREG_A1IbRnP6V3ZA4m",
+            "name": "uat_oauth2",
             "oauth2GrantTypes": {
                 "authorizationCode": {
-                    "clientCredentialId": "CREG_SkuXzN9s8xa3nR"
+                    "clientCredentialId": "CREG_A1IbRnP6V3ZA4m"
                 }
             },
             "scheme": "oauth2",
-            "target": "empulsqaenv.xoxoday.com"
+            "target": "stagingaccount.xoxoday.com"
         }
     ],
     "id": "EXT_08c229f0-a995-4b81-b4fd-78971deda025",

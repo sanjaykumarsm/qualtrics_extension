@@ -380,7 +380,7 @@ export function RideTypeSelectMenu(props, ref) {
       if(authConnectionName) {
         try {
 
-          const url = 'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/sso/stores/user';
+          const url = configration.sso_url + 'sso/stores/user';
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -400,7 +400,7 @@ export function RideTypeSelectMenu(props, ref) {
 
           if(result.responseData && result.responseData.data && result.responseData.data) {
             window.open(
-              'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/redirect/stores/'  + result.responseData.data.ssoToken,
+              configration.sso_url + 'redirect/stores/'  + result.responseData.data.ssoToken,
               '_blank'
             );
           } else {
@@ -432,7 +432,7 @@ export function RideTypeSelectMenu(props, ref) {
       if(authConnectionName) {
         try {
 
-          const url = 'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/sso/stores/user';
+          const url = configration.sso_url + 'sso/stores/user';
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -452,7 +452,7 @@ export function RideTypeSelectMenu(props, ref) {
 
           if(result.responseData && result.responseData.data && result.responseData.data) {
             window.open(
-              'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/redirect/stores/'  + result.responseData.data.ssoToken,
+              configration.sso_url + 'redirect/stores/'  + result.responseData.data.ssoToken,
               '_blank'
             );
           } else {
