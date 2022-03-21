@@ -56,6 +56,7 @@ export function RideTypeSelectMenu(props, ref) {
   const handleChange = e => {
     setMaxValue(e.target.value);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setmaxCountErrorMessage('');
     setAutomatioCreated(false);
     //console.log('cfvgbhn', expiryDate);
@@ -259,6 +260,7 @@ export function RideTypeSelectMenu(props, ref) {
               });
               setMenuOptions(campaignOptions);
               getAutomationDetails(campaignOptions);
+              client.disableSaveButton();
               setEnableSaveBtn(true);
             } else {
               setEnableSaveBtn(false);
@@ -288,6 +290,7 @@ export function RideTypeSelectMenu(props, ref) {
     setAutomatioCreated(false);
     setApprovalType(event.target.value);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     console.log('evemdsjhewhsy', event);
     if(event.target.value === 'yes') {
       setMaxRewardToggled(false);
@@ -332,6 +335,7 @@ export function RideTypeSelectMenu(props, ref) {
     setSelectedCampaign(newSelectedMenuOption);
     //props.toggleSaveButtonState(true);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     // Save it to state
     saveSelection(newSelectedMenuOption);
 
@@ -342,6 +346,7 @@ export function RideTypeSelectMenu(props, ref) {
   function onLinkExpiry(linkOpt) {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setSelectedLinkExpiry(linkOpt);
     setmaxCountErrorMessage('');
   }
@@ -349,6 +354,7 @@ export function RideTypeSelectMenu(props, ref) {
   function onChangeOfMaxCount()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setMaxRewardToggled(!isMaxRewardToggled);
     setmaxCountErrorMessage('');
   }
@@ -356,17 +362,20 @@ export function RideTypeSelectMenu(props, ref) {
   function onChangeOfAllowRepeat()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setAllowRepeat(!isAllowRepeatRewarding);
   }
 
   function onDistributeChnage()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setdateToggled(!isDateToggled);
   }
   function handleDateFilterChange(startDate, endDate) {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setStartDate(startDate);
     setEndDate(endDate);
     setDateErrorMessage('');
@@ -514,13 +523,13 @@ export function RideTypeSelectMenu(props, ref) {
             onClick={() => {
               switchToPlum();
             }}          >
-            {'click here'} {' '}
+            {'Click here'} {' '}
           </span>
           <span
             className='helper-text'
 
           >
-            {'to access Xoxoday Account.'}{' '}
+            {'to access your Xoxoday Account.'}{' '}
           </span>
           <span
             className='helper-text-blue'
@@ -688,9 +697,9 @@ export function RideTypeSelectMenu(props, ref) {
               style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
             >
               <h4 className='section-description'>
-            Allow repeat rewarding{' '}
+            Allow repeat-rewarding{' '}
                 <p className='sub-section-description'>
-              On enabling repeat rewarding, the same person can recieve rewards multiple times.  {' '}
+              On enabling repeat-rewarding, the same person can recive rewards multiple times.  {' '}
                 </p>
               </h4>
 
