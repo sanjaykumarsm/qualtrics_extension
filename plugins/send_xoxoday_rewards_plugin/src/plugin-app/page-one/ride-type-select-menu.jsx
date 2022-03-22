@@ -699,7 +699,7 @@ export function RideTypeSelectMenu(props, ref) {
               <h4 className='section-description'>
             Allow repeat-rewarding{' '}
                 <p className='sub-section-description'>
-              On enabling repeat-rewarding, the same person can recive rewards multiple times.  {' '}
+              On enabling repeat-rewarding, the same person can receive rewards multiple times.  {' '}
                 </p>
               </h4>
 
