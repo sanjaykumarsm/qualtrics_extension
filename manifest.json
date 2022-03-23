@@ -1,6 +1,19 @@
 {
     "connections": [
         {
+            "clientCredentialId": "CREG_1vQiKpDwLUP9Ej",
+            "name": "live_oauth2",
+            "oauth2GrantTypes": {
+                "authorizationCode": {
+                    "clientCredentialId": "CREG_A1IbRnP6V3ZA4m"
+                }
+            },
+            "scheme": "oauth2",
+            "target": "accounts.xoxoday.com"
+        }
+    ],
+    "test_connections": [
+        {
             "clientCredentialId": "CREG_A1IbRnP6V3ZA4m",
             "name": "uat_oauth2",
             "oauth2GrantTypes": {
@@ -10,6 +23,17 @@
             },
             "scheme": "oauth2",
             "target": "stagingaccount.xoxoday.com"
+        },
+        {
+            "clientCredentialId": "CREG_SkuXzN9s8xa3nR",
+            "name": "s100_oauth2_scope",
+            "oauth2GrantTypes": {
+                "authorizationCode": {
+                    "clientCredentialId": "CREG_SkuXzN9s8xa3nR"
+                }
+            },
+            "scheme": "oauth2",
+            "target": "empulsqaenv.xoxoday.com"
         }
     ],
     "id": "EXT_08c229f0-a995-4b81-b4fd-78971deda025",

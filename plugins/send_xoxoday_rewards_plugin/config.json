@@ -1,6 +1,6 @@
 {
   "credentials": [
-    "uat_oauth2"
+    "live_oauth2"
   ],
   "id": "PLUG_9a58867b-56e9-47a2-a7f3-2fe2530100e3",
   "type": "actions_task",
@@ -18,6 +18,6 @@
   "schema": {
     "$schema": "http://json-schema.org/draft-07/schema"
   },
-  "auth_url": "https://stagingaccount.xoxoday.com/chef/v1/oauth/api",
-  "sso_url": "https://stagingaccount.xoxoday.com/chef/v1/oauth/"
+  "auth_url": "https://accounts.xoxoday.com/chef/v1/oauth/api",
+  "sso_url": "https://accounts.xoxoday.com/chef/v1/oauth/"
 }
