@@ -4,6 +4,8 @@ export {
   getDefaultTaskDefinition
 };
 
+import configration from '../../config.json';
+
 function formatConnection(credentialId) {
   // Defaults to basic auth, other auth schemes or formats can be used as described in the SDK documentation
   return {
@@ -29,7 +31,7 @@ function formatFormData(formFields) {
 function getDefaultTaskDefinition(client) {
   // Fill this out with your default/static api values
   return {
-    url: 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api',
+    url: configration.auth_url,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

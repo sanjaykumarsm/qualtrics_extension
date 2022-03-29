@@ -10,12 +10,15 @@ import moment               from 'moment';
 import Base64 from 'react-native-base64';
 //import { toUpper } from 'lodash';
 
+import configration from '../../../config.json';
+
 export function RideTypeSelectMenu(props, ref) {
   const { client, saveSelection, selectedMenuOption } = props;
   const authConnectionName = client.pluginClientInstance.context.availableConnections[0];
   //const linkExpiryDict = JSON.parse(JSON.stringify(expiryDate));
   const auth = client.pluginClientInstance.context;
   console.log(auth);
+  console.log('hnsjakmjdes', configration);
   const expiryDateDict = [
     { value: '365', label: '1 year' },
     { value: '274', label: '9 Months' },
@@ -53,6 +56,7 @@ export function RideTypeSelectMenu(props, ref) {
   const handleChange = e => {
     setMaxValue(e.target.value);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setmaxCountErrorMessage('');
     setAutomatioCreated(false);
     //console.log('cfvgbhn', expiryDate);
@@ -92,7 +96,7 @@ export function RideTypeSelectMenu(props, ref) {
           setCreateAutoLoading(true);
           const start_dateObj = startDate !== '' && approvalType === 'no' ? moment(startDate).format('YYYY-MM-DD') : moment(new Date()).format('YYYY-MM-DD');
           const end_dateObj = endDate !== '' && approvalType === 'no' && isDateToggled ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
-          const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
+          const url = configration.auth_url;
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -140,7 +144,7 @@ export function RideTypeSelectMenu(props, ref) {
         setisLinkExpLoading(true);
         try {
 
-          const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
+          const url = configration.auth_url;
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -230,8 +234,7 @@ export function RideTypeSelectMenu(props, ref) {
     (async () => {
       if(authConnectionName) {
         try {
-
-          const url = 'https://empulsqaenv.xoxoday.com/chef/v1/oauth/api';
+          const url = configration.auth_url;
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -245,7 +248,6 @@ export function RideTypeSelectMenu(props, ref) {
             paramTemplate: 'Bearer %s'
           };
           const result = await client.fetch(url, config);
-          console.log(JSON.stringify(result));
           if(result.responseData && result.responseData.data && result.responseData.data && result.responseData.data.getOneClickSiteList) {
             const campaign_res = result.responseData.data.getOneClickSiteList;
             let  campaignOptions = [];
@@ -256,10 +258,9 @@ export function RideTypeSelectMenu(props, ref) {
                   ? campaignOptions.push(val)
                   : null;
               });
-              console.log('vdgbhsmk,la', campaignOptions);
-              console.log('vdgbhsmka push', campaign_res.data);
               setMenuOptions(campaignOptions);
               getAutomationDetails(campaignOptions);
+              client.disableSaveButton();
               setEnableSaveBtn(true);
             } else {
               setEnableSaveBtn(false);
@@ -289,6 +290,7 @@ export function RideTypeSelectMenu(props, ref) {
     setAutomatioCreated(false);
     setApprovalType(event.target.value);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     console.log('evemdsjhewhsy', event);
     if(event.target.value === 'yes') {
       setMaxRewardToggled(false);
@@ -333,6 +335,7 @@ export function RideTypeSelectMenu(props, ref) {
     setSelectedCampaign(newSelectedMenuOption);
     //props.toggleSaveButtonState(true);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     // Save it to state
     saveSelection(newSelectedMenuOption);
 
@@ -343,6 +346,7 @@ export function RideTypeSelectMenu(props, ref) {
   function onLinkExpiry(linkOpt) {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setSelectedLinkExpiry(linkOpt);
     setmaxCountErrorMessage('');
   }
@@ -350,6 +354,7 @@ export function RideTypeSelectMenu(props, ref) {
   function onChangeOfMaxCount()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setMaxRewardToggled(!isMaxRewardToggled);
     setmaxCountErrorMessage('');
   }
@@ -357,17 +362,20 @@ export function RideTypeSelectMenu(props, ref) {
   function onChangeOfAllowRepeat()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setAllowRepeat(!isAllowRepeatRewarding);
   }
 
   function onDistributeChnage()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setdateToggled(!isDateToggled);
   }
   function handleDateFilterChange(startDate, endDate) {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
+    client.disableSaveButton();
     setStartDate(startDate);
     setEndDate(endDate);
     setDateErrorMessage('');
@@ -381,7 +389,7 @@ export function RideTypeSelectMenu(props, ref) {
       if(authConnectionName) {
         try {
 
-          const url = 'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/sso/stores/user';
+          const url = configration.sso_url + 'sso/stores/user';
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -401,7 +409,7 @@ export function RideTypeSelectMenu(props, ref) {
 
           if(result.responseData && result.responseData.data && result.responseData.data) {
             window.open(
-              'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/redirect/stores/'  + result.responseData.data.ssoToken,
+              configration.sso_url + 'redirect/stores/'  + result.responseData.data.ssoToken,
               '_blank'
             );
           } else {
@@ -433,7 +441,7 @@ export function RideTypeSelectMenu(props, ref) {
       if(authConnectionName) {
         try {
 
-          const url = 'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/sso/stores/user';
+          const url = configration.sso_url + 'sso/stores/user';
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -453,7 +461,7 @@ export function RideTypeSelectMenu(props, ref) {
 
           if(result.responseData && result.responseData.data && result.responseData.data) {
             window.open(
-              'https://empulsqaenv.xoxoday.com:8005/chef/v1/oauth/redirect/stores/'  + result.responseData.data.ssoToken,
+              configration.sso_url + 'redirect/stores/'  + result.responseData.data.ssoToken,
               '_blank'
             );
           } else {
@@ -515,13 +523,13 @@ export function RideTypeSelectMenu(props, ref) {
             onClick={() => {
               switchToPlum();
             }}          >
-            {'click here'} {' '}
+            {'Click here'} {' '}
           </span>
           <span
             className='helper-text'
 
           >
-            {'to access Xoxoday Account.'}{' '}
+            {'to access your Xoxoday Account.'}{' '}
           </span>
           <span
             className='helper-text-blue'
@@ -689,9 +697,9 @@ export function RideTypeSelectMenu(props, ref) {
               style={{ display: 'flex', justifyContent: 'space-between', marginRight: '10px', alignItems: 'baseline' }}
             >
               <h4 className='section-description'>
-            Allow repeat rewarding{' '}
+            Allow repeat-rewarding{' '}
                 <p className='sub-section-description'>
-              On enabling repeat rewarding, the same person can recieve rewards multiple times.  {' '}
+              On enabling repeat-rewarding, the same person can receive rewards multiple times.  {' '}
                 </p>
               </h4>
 
