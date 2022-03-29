@@ -1,7 +1,7 @@
 {
 	"auth_url": "https://accounts.xoxoday.com/chef/v1/oauth/api",
 	"credentials": [
-		"live_oauth2"
+		"uat_oauth2"
 	],
 	"id": "PLUG_9a58867b-56e9-47a2-a7f3-2fe2530100e3",
 	"metadata": {
