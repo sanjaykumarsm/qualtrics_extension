@@ -1,23 +1,23 @@
 {
-  "credentials": [
-    "live_oauth2"
-  ],
-  "id": "PLUG_9a58867b-56e9-47a2-a7f3-2fe2530100e3",
-  "type": "actions_task",
-  "version": "0.0.1",
-  "metadata": {
-    "tags": [
-      "test",
-      "tag",
-      "survey"
-    ],
-    "worker": {
-      "type": "runner"
-    }
-  },
-  "schema": {
-    "$schema": "http://json-schema.org/draft-07/schema"
-  },
-  "auth_url": "https://accounts.xoxoday.com/chef/v1/oauth/api",
-  "sso_url": "https://accounts.xoxoday.com/chef/v1/oauth/"
+	"auth_url": "https://accounts.xoxoday.com/chef/v1/oauth/api",
+	"credentials": [
+		"live_oauth2"
+	],
+	"id": "PLUG_9a58867b-56e9-47a2-a7f3-2fe2530100e3",
+	"metadata": {
+		"tags": [
+			"test",
+			"tag",
+			"survey"
+		],
+		"worker": {
+			"type": "runner"
+		}
+	},
+	"schema": {
+		"$schema": "http://json-schema.org/draft-07/schema"
+	},
+	"sso_url": "https://accounts.xoxoday.com/chef/v1/oauth/",
+	"type": "actions_task",
+	"version": "0.0.1"
 }
