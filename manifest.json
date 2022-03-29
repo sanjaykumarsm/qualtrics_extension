@@ -1,24 +1,52 @@
 {
-    "connections": [
-        {
-            "clientCredentialId": "CREG_A1IbRnP6V3ZA4m",
-            "name": "uat_oauth2",
-            "oauth2GrantTypes": {
-                "authorizationCode": {
-                    "clientCredentialId": "CREG_A1IbRnP6V3ZA4m"
-                }
-            },
-            "scheme": "oauth2",
-            "target": "stagingaccount.xoxoday.com"
-        }
-    ],
-    "id": "EXT_08c229f0-a995-4b81-b4fd-78971deda025",
-    "info": {
-        "organizationName": "",
-        "privacyUrl": "https://www.example.com",
-        "termsUrl": "https://www.example.com"
-    },
-    "metadata": {},
-    "settings": [],
-    "version": "0.0.1"
+	"connections": [
+		{
+			"clientCredentialId": "CREG_1vQiKpDwLUP9Ej",
+			"name": "live_oauth2",
+			"oauth2GrantTypes": {
+				"authorizationCode": {
+					"clientCredentialId": "CREG_A1IbRnP6V3ZA4m"
+				}
+			},
+			"scheme": "oauth2",
+			"target": "accounts.xoxoday.com"
+		}
+	],
+	"id": "EXT_08c229f0-a995-4b81-b4fd-78971deda025",
+	"info": {
+		"privacyUrl": "https://www.example.com",
+		"termsUrl": "https://www.example.com"
+	},
+	"metadata": {},
+	"settings": [],
+	"test_connections": [
+		{
+			"clientCredentialId": "CREG_A1IbRnP6V3ZA4m",
+			"name": "uat_oauth2",
+			"oauth2GrantTypes": {
+				"authorizationCode": {
+					"clientCredentialId": "CREG_A1IbRnP6V3ZA4m"
+				}
+			},
+			"scheme": "oauth2",
+			"target": "stagingaccount.xoxoday.com"
+		},
+		{
+			"clientCredentialId": "CREG_SkuXzN9s8xa3nR",
+			"name": "s100_oauth2_scope",
+			"oauth2GrantTypes": {
+				"authorizationCode": {
+					"clientCredentialId": "CREG_SkuXzN9s8xa3nR"
+				}
+			},
+			"scheme": "oauth2",
+			"target": "empulsqaenv.xoxoday.com"
+		}
+	],
+	"validDomains": [
+		"accounts.xoxoday.com",
+		"stagingaccount.xoxoday.com",
+		"empulsqaenv.xoxoday.com"
+	],
+	"version": "0.0.2"
 }
