@@ -44,7 +44,9 @@
 		}
 	],
 	"validDomains": [
-		"accounts.xoxoday.com"
+		"accounts.xoxoday.com",
+		"stagingaccount.xoxoday.com",
+		"empulsqaenv.xoxoday.com"
 	],
 	"version": "0.0.1"
 }
