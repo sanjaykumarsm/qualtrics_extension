@@ -1,0 +1,5 @@
+!.*
+public/*
+!public/translations/
+package-lock.json
+node_modules/
