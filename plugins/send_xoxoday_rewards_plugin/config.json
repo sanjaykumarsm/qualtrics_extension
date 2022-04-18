@@ -1,5 +1,5 @@
 {
-	"auth_url": "https://accounts.xoxoday.com/chef/v1/oauth/api",
+	"auth_url": "https://stagingaccount.xoxoday.com/chef/v1/oauth/api",
 	"credentials": [
 		"uat_oauth2"
 	],
@@ -17,7 +17,7 @@
 	"schema": {
 		"$schema": "http://json-schema.org/draft-07/schema"
 	},
-	"sso_url": "https://accounts.xoxoday.com/chef/v1/oauth/",
+	"sso_url": "https://stagingaccount.xoxoday.com/chef/v1/oauth/",
 	"type": "actions_task",
 	"version": "0.0.1"
 }
