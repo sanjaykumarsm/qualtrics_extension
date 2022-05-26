@@ -2,6 +2,8 @@ import './styles.css';
 import React, { useEffect, useState } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import { Label, LoadingSpinner, Dropdown, DropdownButton, DropdownList, DropdownOption, Divider } from '@qualtrics/ui-react';
+import Base64 from 'react-native-base64';
+import configration from '../config.json';
 
 export default function DataConfigurationPanel({
   client,
@@ -10,6 +12,7 @@ export default function DataConfigurationPanel({
   const [ definition, setDefinition ] = useState();
 
   useEffect(() => {
+    getAPI()
     let canceled = false;
     if(!definition) {
       const fetchDefinition = async () => {
@@ -67,6 +70,45 @@ export default function DataConfigurationPanel({
     if(axes) {
       dimensions = axes[0].dimensions;
     }
+  }
+
+  function getAPI() {
+    console.log('API start');
+
+    let createCampaignLink = '&createCampaignLink=1';
+    let encryptCreateCampaignLink = Base64.encode(createCampaignLink);
+    // console.log(client)
+    const authConnectionName = client.context.availableConnections[0];
+    console.log("connections", client)
+    (async () => {
+      if(authConnectionName) {
+        try {
+
+          const url = configration.sso_url + 'sso/stores/user';
+          const config = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: {
+              'landing_page_custom': '/admin/campaign/xoxo-link-campaign/?' + encryptCreateCampaignLink
+            },
+          };
+
+          config.connection = {
+            connectionName: authConnectionName,
+            paramFormat: 'header',
+            paramName: 'Authorization',
+            paramTemplate: 'Bearer %s'
+          };
+          const result = await client.fetch(url, config);
+          console.log(result);
+
+        } catch(error) {
+          console.log(error);
+        } 
+      } 
+    }
+    )();
+
   }
 
   // indexPosition derived from relative array element position
@@ -243,6 +285,8 @@ export default function DataConfigurationPanel({
 
     emitConfigurationChangeEvent(updatedConfiguration);
   }
+
+
 
   function emitConfigurationChangeEvent(updatedConfiguration) {
     updatedConfiguration.isComplete = updatedConfiguration.metrics && updatedConfiguration.axes[0].dimensions.length > 0;
