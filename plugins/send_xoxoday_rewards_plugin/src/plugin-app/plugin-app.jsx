@@ -7,7 +7,7 @@ import cloneDeep from 'lodash.clonedeep';
 
 // Internal dependencies
 import { ConfigurationForm } from './page-one/configuration-form.jsx';
-//import { IntroductorySection } from './page-one/introductory-section.jsx';
+import { IntroductorySection } from './page-one/introductory-section.jsx';
 import { RideTypeSelectMenu } from './page-one/ride-type-select-menu.jsx';
 //import { CustomerMessageForm } from './page-two/customer-message-form.jsx';
 import { getDefaultTaskDefinition, formatConnection, formatFormData } from './outbound-http-request-task-definition';
@@ -20,6 +20,7 @@ export function PluginApp(props) {
 
   const client = props.client;
   const biRef = useRef();
+  const pageTwoRef = useRef();
   /////////////////////////////////////
   /////////////   Hooks   /////////////
   /////////////////////////////////////
@@ -27,6 +28,8 @@ export function PluginApp(props) {
   const [ canSaveTask, setCanSaveTask ] = useState(loadInitialSaveTaskState);
   const [ taskDefinition, setTaskDefinition ] = useState(loadTaskDefinition);
   const [ pageNum, setPageNum ] = useState(1);
+  const [ automationerror, setAutomationError ] = useState('');
+  //const [ automatonData, setAutomationData ] =  useState([]);
 
   // Handle logic for enabling the save button
   useEffect(() => {
@@ -40,8 +43,8 @@ export function PluginApp(props) {
   }, [ taskDefinition ]);
 
   useEffect(() => {
-    client.onNext(page => setPageNum(page));
-    client.onBack(page => setPageNum(page));
+    client.onNext(page => nextPageSetup(page));
+    client.onBack(page => backButtonClicked(page));
   }, []);
 
   /////////////////////////////////////////
@@ -54,10 +57,30 @@ export function PluginApp(props) {
     </div>
   );
 
-  // function nextPageSetup(page) {
-  //   biRef.nextPageSetup();
-  //   //from call
-  // }
+  function backButtonClicked(page) {
+    console.log('page number on click of back btn', page);
+    if(page === 2) {
+      console.log('current', client);
+      setPageNum(1);
+      setAutomationError('');
+      client.currentPage = 1;
+      console.log('current after update', client);
+    } else {
+      setPageNum(page);
+    }
+
+  }
+
+  function nextPageSetup(page) {
+    console.log('page number on click of next', page);
+    if(page === 2) {
+      biRef.nextPageSetup(page);
+    } else {
+      setPageNum(page);
+    }
+
+    //from call
+  }
 
   /////////////////////////////////////////////
   /////////////   Hook Handlers   /////////////
@@ -138,6 +161,32 @@ export function PluginApp(props) {
     return updatedTaskDefinition;
   }
 
+  function getTheCreateData(dataVal) {
+    console.log('dataVal', dataVal);
+    const updatedTaskDefinition = cloneDeep(taskDefinition);
+    // update selected menu option
+    updatedTaskDefinition.config.auatomationData = dataVal;
+    setTaskDefinition(updatedTaskDefinition);
+    //setAutomationData(dataVal);
+    setPageNum(2);
+  }
+
+  function updateapiErrorState(error) {
+    setAutomationError(error);
+    setPageNum(1);
+    client.currentPage = 1;
+
+  }
+  function updateSuccessState() {
+    setAutomationError('');
+    // console.log('eventttt', client.events.handler);
+    client.events.next.handler();
+    // client.currentPage = 3;
+    // setPageNum(3);
+    //nextPageSetup(3);
+
+  }
+
   //////////////////////////////////////////////////
   /////////////   Component Handlers   /////////////
   //////////////////////////////////////////////////
@@ -147,25 +196,44 @@ export function PluginApp(props) {
       case 1:
         return (
           <>
-            {/*<IntroductorySection
-              client={client}
-            >
-            </IntroductorySection> */}
             <RideTypeSelectMenu
               biRef={biRef}
               client={client}
+              //automationData={automatonData}
+              automationData={taskDefinition.config.auatomationData}
               selectedMenuOption={taskDefinition.config.selectedMenuOption}
               toggleSaveButtonState={toggleSaveButtonState}
               saveSelection={saveSelection}
+              getTheCreateData={getTheCreateData}
+              moveToNextPage={moveToNextPage}
+              automationError = {automationerror}
             >
             </RideTypeSelectMenu>
 
           </>
         );
+
       case 2:
+        return (
+
+          <IntroductorySection
+            client={client}
+            pageTwoRef={pageTwoRef}
+            automationData={taskDefinition.config.auatomationData}
+            selectedMenuOption={taskDefinition.config.selectedMenuOption}
+            updateFailedState = {updateapiErrorState}
+            updateSuccessState = {updateSuccessState}
+            //onBakPageSetup={onBakPageSetup}
+          >
+          </IntroductorySection>
+
+        );
+
+      case 3:
         return (
           <ConfigurationForm
             client={client}
+            automationData={taskDefinition.config.auatomationData}
             toggleSaveButtonState={toggleSaveButtonState}
             attachFormFieldsToTaskDefinition={attachFormFieldsToTaskDefinition}
             formFields={taskDefinition.config.formFields}
@@ -174,9 +242,7 @@ export function PluginApp(props) {
         );
     }
   }
-  // function moveToNextPage(page) {
-  //   setPageNum(page);
-  // }
+
   function attachFormFieldsToTaskDefinition(formFields) {
     const updatedTaskDefinition = cloneDeep(taskDefinition);
     updatedTaskDefinition.config.formFields = formFields;
@@ -187,5 +253,8 @@ export function PluginApp(props) {
     const updatedCanSaveTask = { ...canSaveTask };
     updatedCanSaveTask.isFormValid = isFormValid;
     setCanSaveTask(updatedCanSaveTask);
+  }
+  function moveToNextPage(page) {
+    setPageNum(page);
   }
 }

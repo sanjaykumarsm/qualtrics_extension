@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SelectMenu, MenuItem, LoadingSpinner, Label, RadioGroup, RadioOption, Switch, Input, Button } from '@qualtrics/ui-react';
+import { SelectMenu, MenuItem, LoadingSpinner, Label, RadioGroup, RadioOption, Switch, Input } from '@qualtrics/ui-react';
 import {
   DateRangePicker
 }                           from 'react-dates';
@@ -13,12 +13,12 @@ import Base64 from 'react-native-base64';
 import configration from '../../../config.json';
 
 export function RideTypeSelectMenu(props, ref) {
-  const { client, saveSelection, selectedMenuOption } = props;
+  const { client, saveSelection, selectedMenuOption, automationData, automationError } = props;
   const authConnectionName = client.pluginClientInstance.context.availableConnections[0];
   //const linkExpiryDict = JSON.parse(JSON.stringify(expiryDate));
-  const auth = client.pluginClientInstance.context;
-  console.log(auth);
-  console.log('hnsjakmjdes', configration);
+  //const auth = client.pluginClientInstance.context;
+  // console.log(auth);
+  // console.log('hnsjakmjdes', configration);
   const expiryDateDict = [
     { value: '365', label: '1 year' },
     { value: '274', label: '9 Months' },
@@ -51,18 +51,79 @@ export function RideTypeSelectMenu(props, ref) {
   const [ pageErrorMsg, setPageErrorMsg ] = useState();
   const [ ispageError, setPageError ] = useState(false);
   const [ isAutomationCreate, setAutomatioCreated ] = useState(false);
-
-  // const [endFocused , setEndFocused] = useState(false);
+  console.log('gvbhnj', automationData);
+  console.log('qewswsax', selectedMenuOption);
+  console.log('props.......', props);
   const handleChange = e => {
     setMaxValue(e.target.value);
     setEnableSaveBtn(true);
-    client.disableSaveButton();
+    //client.disableSaveButton();
     setmaxCountErrorMessage('');
     setAutomatioCreated(false);
-    //console.log('cfvgbhn', expiryDate);
+    console.log('sknaidu8186', isAutomationCreate);
+    console.log('dwed', enableSaveBtn);
+    console.log('dewqswd', isCreateAutoLoading);
   };
 
   useEffect(retrieveSelectMenuOptions, []);
+
+  useEffect(() => {
+    populatevaluesFromBack();
+    // Overwrite handler only when the taskDefinition changes
+  }, [ automationData ]);
+  useEffect(() => {
+    if(automationError !== '') {
+      setPageError(true);
+      setPageErrorMsg(automationError);
+    } else {
+      setPageError(false);
+      setPageErrorMsg('');
+    }
+    // Overwrite handler only when the taskDefinition changes
+  }, [ automationError ]);
+  useEffect(() => {
+    if(isDateToggled) {
+      if(startDate === '') {
+        setDateErrorMessage('Start date can not be empty');
+        client.disableSaveButton();
+      } else if(endDate === '') {
+        setDateErrorMessage('End date can not be empty');
+        client.disableSaveButton();
+      } else {
+        client.enableSaveButton();
+      }
+    }
+    // Overwrite handler only when the taskDefinition changes
+  }, [ isDateToggled, startDate, endDate ]);
+
+  useEffect(() => {
+    if(isMaxRewardToggled && maxCountValue < 1) {
+      setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
+      client.disableSaveButton();
+    } else if(isMaxRewardToggled  && rewardsTriggred > maxCountValue) {
+      setmaxCountErrorMessage('Cannot be lower than the count which has already been triggered.');
+      client.disableSaveButton();
+    } else {
+      client.enableSaveButton();
+    }
+    // Overwrite handler only when the taskDefinition changes
+  }, [ isMaxRewardToggled, maxCountValue ]);
+
+  function populatevaluesFromBack() {
+
+    if(automationData) {
+      setApprovalType(automationData.approvalType);
+      setdateToggled(automationData.isDateToggled);
+      setMaxRewardToggled(automationData.isMaxRewardToggled);
+      setMaxValue(automationData.maxCountValue);
+      let filteredAutomationDict = expiryDateDict.filter((i) => i.value === `${automationData.selectedLinkExpiry}`);
+      setDefaultLink(filteredAutomationDict.length !== 0 ? filteredAutomationDict[0] : { value: '365', label: '1 year' });
+      setStartDate(startDate);
+      setEndDate(endDate);
+
+    }
+    console.log('automationData in page 1.........', automationData);
+  }
 
   function nextPageSetup() {
     CreateAndEditAutomation();
@@ -71,36 +132,19 @@ export function RideTypeSelectMenu(props, ref) {
   function CreateAndEditAutomation() {
     setPageError(false);
     setAutomatioCreated(false);
-    if(isDateToggled && approvalType === 'no') {
-      if(startDate === '') {
-        setDateErrorMessage('Start date can not be empty');
-        return;
-      } else if(endDate === '') {
-        setDateErrorMessage('End date can not be empty');
-        return;
-      }
-    }
-    if(isMaxRewardToggled && approvalType === 'no' && maxCountValue < 1) {
-      setmaxCountErrorMessage('Field can’t be “0 or lessthan that” please enter any number');
-      return;
-    }
-    if(isMaxRewardToggled && approvalType === 'no' && rewardsTriggred > maxCountValue) {
-      setmaxCountErrorMessage('Cannot be lower than the count which has already been triggered.');
-      return;
-    }
 
     (async () => {
       if(authConnectionName) {
         try {
           const survey_id =  client.pluginClientInstance.context.userMeta.surveyId;
           setCreateAutoLoading(true);
-          const start_dateObj = startDate !== '' && approvalType === 'no' ? moment(startDate).format('YYYY-MM-DD') : moment(new Date()).format('YYYY-MM-DD');
-          const end_dateObj = endDate !== '' && approvalType === 'no' && isDateToggled ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
-          const url = configration.auth_url;
+          const start_dateObj = startDate !== '' ? moment(startDate).format('YYYY-MM-DD') : moment(new Date()).format('YYYY-MM-DD');
+          const end_dateObj = endDate !== ''  && isDateToggled ?  moment(endDate).format('YYYY-MM-DD') : '2030-12-30';
+          // const url = configration.auth_url;
           const config = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': (approvalType === 'yes' || !isMaxRewardToggled) ? null : maxCountValue ? maxCountValue : null, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': selectedLinkExpiry, 'enable_repeat_rewarding': approvalType === 'yes' ? true : isAllowRepeatRewarding } } },
+            body: { 'query': 'qualtrics_ext.mutation.setupExtensionBasedAutomation', 'tag': 'qualtrics_ext', 'variables': { 'add_data': { 'is_extension_based': true, 'platform_id': 16, 'effective_from': start_dateObj, 'effective_to': end_dateObj, survey_id, 'max_reward_count': (!isMaxRewardToggled) ? null : maxCountValue ? maxCountValue : null, 'instantApproval': approvalType === 'yes' ? false : true, 'reward_amount': selectedCampaign.denomination_value, 'currency_code': selectedCampaign.currencyCode, 'campaignId': selectedCampaign.campaignId, 'template_id': selectedCampaign.mail_template_id, 'batchexpirydate': selectedLinkExpiry, 'enable_repeat_rewarding': isAllowRepeatRewarding } } },
           };
 
           config.connection = {
@@ -109,19 +153,33 @@ export function RideTypeSelectMenu(props, ref) {
             paramName: 'Authorization',
             paramTemplate: 'Bearer %s'
           };
-          const result = await client.fetch(url, config);
-          setCreateAutoLoading(false);
-          if(result && result.responseData && result.responseData.data && result.responseData.data.setupExtensionBasedAutomation &&  result.responseData.data.setupExtensionBasedAutomation.success) {
-            client.enableSaveButton();
-            setEnableSaveBtn(false);
-            setAutomatioCreated(true);
-          } else {
-            client.disableSaveButton();
-            setEnableSaveBtn(true);
-            setPageError(true);
-            setPageErrorMsg(result.responseData.data.setupExtensionBasedAutomation.message ? result.responseData.data.setupExtensionBasedAutomation.message  : 'failed to create automation');
-            setAutomatioCreated(false);
-          }
+          let dict = {};
+          dict.startDate = start_dateObj;
+          dict.endDate = end_dateObj;
+          dict.isDateToggled = isDateToggled;
+          dict.maxCountValue = maxCountValue;
+          dict.approvalType = approvalType;
+          dict.selectedLinkExpiry = selectedLinkExpiry;
+          dict.isAllowRepeatRewarding = isAllowRepeatRewarding;
+          dict.isMaxRewardToggled = isMaxRewardToggled;
+          dict.isDateToggled = isDateToggled;
+          props.getTheCreateData(dict);
+          // console.log('props....', props);
+          // moveToNextPage(2);
+          setPageErrorMsg('');
+          // const result = await client.fetch(url, config);
+          // setCreateAutoLoading(false);
+          // if(result && result.responseData && result.responseData.data && result.responseData.data.setupExtensionBasedAutomation &&  result.responseData.data.setupExtensionBasedAutomation.success) {
+          //   //client.enableSaveButton();
+          //   setEnableSaveBtn(false);
+          //   setAutomatioCreated(true);
+          // } else {
+          //   //client.disableSaveButton();
+          //   setEnableSaveBtn(true);
+          //   setPageError(true);
+          //   setPageErrorMsg(result.responseData.data.setupExtensionBasedAutomation.message ? result.responseData.data.setupExtensionBasedAutomation.message  : 'failed to create automation');
+          //   setAutomatioCreated(false);
+          // }
 
         } catch(error) {
           console.log(error);
@@ -164,7 +222,7 @@ export function RideTypeSelectMenu(props, ref) {
             }
             let campainData = result.responseData.data.getAutomationBySurveyId.data[0];
             setEnableSaveBtn(false);
-            client.disableSaveButton();
+            //client.disableSaveButton();
             if(campainData) {
               setAutomationDetails(campainData);
               console.log(automationDetails);
@@ -180,6 +238,7 @@ export function RideTypeSelectMenu(props, ref) {
                 setAlreadyRewardsSent(number_of_awards_triggered >= 1 ? true : false);
                 setStartDate(effective_from);
                 setEndDate(effective_to);
+                setDateErrorMessage('');
                 setMaxValue(max_reward_count_obj >= 1 ? max_reward_count_obj : null);
                 setMaxRewardToggled(max_reward_count_obj >= 1 &&  campainData.additional_details.automation.approval_type ? true : false);
                 setdateToggled(campainData.additional_details.automation.approval_type);
@@ -230,7 +289,7 @@ export function RideTypeSelectMenu(props, ref) {
     )();
   }
   function retrieveSelectMenuOptions() {
-    client.disableSaveButton();
+    //client.disableSaveButton();
     (async () => {
       if(authConnectionName) {
         try {
@@ -260,7 +319,7 @@ export function RideTypeSelectMenu(props, ref) {
               });
               setMenuOptions(campaignOptions);
               getAutomationDetails(campaignOptions);
-              client.disableSaveButton();
+              //client.disableSaveButton();
               setEnableSaveBtn(true);
             } else {
               setEnableSaveBtn(false);
@@ -290,17 +349,17 @@ export function RideTypeSelectMenu(props, ref) {
     setAutomatioCreated(false);
     setApprovalType(event.target.value);
     setEnableSaveBtn(true);
-    client.disableSaveButton();
-    console.log('evemdsjhewhsy', event);
-    if(event.target.value === 'yes') {
-      setMaxRewardToggled(false);
-      setAllowRepeat(false);
-      setdateToggled(false);
-    }
+    ////client.disableSaveButton();
+    //console.log('evemdsjhewhsy', event);
+    //if(event.target.value === 'yes') {
+    setMaxRewardToggled(false);
+    setAllowRepeat(false);
+    setdateToggled(false);
+    //}
 
   }
   function selectedAutomationCampaign(menuOptionId, menuOptionObj) {
-    console.log('hdenjwsqaw', menuOptionId, menuOptionObj);
+    // console.log('hdenjwsqaw', menuOptionId, menuOptionObj);
     // find the the selection
     const newSelectedMenuOption = menuOptionObj.find((menuOption) => {
       return menuOption.campaignId === menuOptionId;
@@ -312,6 +371,7 @@ export function RideTypeSelectMenu(props, ref) {
       return;
     }
     setSelectedCampaign(newSelectedMenuOption);
+    client.enableSaveButton();
     // props.toggleSaveButtonState(true);
     // setEnableSaveBtn(true);
     // Save it to state
@@ -333,9 +393,10 @@ export function RideTypeSelectMenu(props, ref) {
       return;
     }
     setSelectedCampaign(newSelectedMenuOption);
+    client.enableSaveButton();
     //props.toggleSaveButtonState(true);
     setEnableSaveBtn(true);
-    client.disableSaveButton();
+    //client.disableSaveButton();
     // Save it to state
     saveSelection(newSelectedMenuOption);
 
@@ -346,7 +407,7 @@ export function RideTypeSelectMenu(props, ref) {
   function onLinkExpiry(linkOpt) {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
-    client.disableSaveButton();
+    //client.disableSaveButton();
     setSelectedLinkExpiry(linkOpt);
     setmaxCountErrorMessage('');
   }
@@ -354,7 +415,7 @@ export function RideTypeSelectMenu(props, ref) {
   function onChangeOfMaxCount()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
-    client.disableSaveButton();
+    //client.disableSaveButton();
     setMaxRewardToggled(!isMaxRewardToggled);
     setmaxCountErrorMessage('');
   }
@@ -362,20 +423,20 @@ export function RideTypeSelectMenu(props, ref) {
   function onChangeOfAllowRepeat()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
-    client.disableSaveButton();
+    //client.disableSaveButton();
     setAllowRepeat(!isAllowRepeatRewarding);
   }
 
   function onDistributeChnage()  {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
-    client.disableSaveButton();
+    //client.disableSaveButton();
     setdateToggled(!isDateToggled);
   }
   function handleDateFilterChange(startDate, endDate) {
     setAutomatioCreated(false);
     setEnableSaveBtn(true);
-    client.disableSaveButton();
+    //client.disableSaveButton();
     setStartDate(startDate);
     setEndDate(endDate);
     setDateErrorMessage('');
@@ -511,9 +572,10 @@ export function RideTypeSelectMenu(props, ref) {
             {pageErrorMsg}
           </div>
         </div> : null}
-        <div className='text-center'>
+        {/* <div className='text-center'>
           <Button disabled={ selectedCampaign.length === 0 ? true : !enableSaveBtn  } className="save-btn" kind='primary' onClick={CreateAndEditAutomation}>{isCreateAutoLoading ? <LoadingSpinner background='fade' show={isCreateAutoLoading} size='small'></LoadingSpinner> : isAutomationCreate ? 'Saved' : 'Save'  }</Button>
         </div>
+  */}
         <div className='config-campaign'>
           <div className='heading'>
           Configure Xoxoday Rewards
@@ -595,9 +657,10 @@ export function RideTypeSelectMenu(props, ref) {
             </div>
 
             <div>
-              <RadioGroup label="Approval Required?" name="example1" onChange={onApprovalChang} defaultValue={approvalType} value = {approvalType}>
-                <RadioOption value="yes" label="Yes"  disabled = {isAlreadyRewardsSent} />
-                <RadioOption value="no" label="No" disabled = {isAlreadyRewardsSent} />
+              <RadioGroup label="Select Reward approval settings" name="example1" onChange={onApprovalChang} defaultValue={approvalType} value = {approvalType}>
+                <RadioOption value="no" label="Auto approval" disabled = {isAlreadyRewardsSent} />
+                <RadioOption value="yes" label="Manual Approval"  disabled = {isAlreadyRewardsSent} />
+
               </RadioGroup>
             </div>
 
@@ -650,7 +713,7 @@ export function RideTypeSelectMenu(props, ref) {
                 </p>
               </h4>
 
-              <Switch style={{ marginTop: 12 }} onChange={onDistributeChnage} disabled = {approvalType === 'yes' ? true : false} checked = {isDateToggled}/>
+              <Switch style={{ marginTop: 12 }} onChange={onDistributeChnage}  checked = {isDateToggled}/>
             </div>
             {isDateToggled ?
 
@@ -680,7 +743,7 @@ export function RideTypeSelectMenu(props, ref) {
               Define the maximum number of rewards that will be sent out automatically. {' '}
                 </p>
               </h4>
-              <Switch style={{ marginTop: 12 }} onChange={onChangeOfMaxCount} disabled = {approvalType === 'yes' ? true : false} checked = {isMaxRewardToggled}/>
+              <Switch style={{ marginTop: 12 }} onChange={onChangeOfMaxCount}  checked = {isMaxRewardToggled}/>
             </div>
             {isMaxRewardToggled ?
               <div>
@@ -703,7 +766,7 @@ export function RideTypeSelectMenu(props, ref) {
                 </p>
               </h4>
 
-              <Switch style={{ marginTop: 12 }} onChange={onChangeOfAllowRepeat} disabled = {approvalType === 'yes' ? true : false} checked = {isAllowRepeatRewarding}/>
+              <Switch style={{ marginTop: 12 }} onChange={onChangeOfAllowRepeat}  checked = {isAllowRepeatRewarding}/>
 
             </div>
 

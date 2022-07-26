@@ -12,7 +12,7 @@ import { UIProvider } from '@qualtrics/ui-react';
 // Internal dependencies
 import { PluginApp } from './plugin-app/plugin-app.jsx';
 const config = {
-  pages: 2
+  pages: 3
 };
 
 (async () => {
